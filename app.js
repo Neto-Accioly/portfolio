@@ -158,6 +158,17 @@ function bindModal() {
     // Bind dos formulários de documentação e bugs
     bindTestCaseForm();
     bindBugForm();
+    
+    // Fechar modal clicando fora
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal') && e.target.classList.contains('show')) {
+            if (e.target.id === 'cardModal') closeCardModal();
+            else if (e.target.id === 'dashboardModal') closeDashboardModal();
+            else if (e.target.id === 'evidenceModal') closeEvidenceModal();
+            else if (e.target.id === 'bugSelectionModal') closeBugSelectionModal();
+        }
+    });
+    
     byId('deleteCard').addEventListener('click', () => {
         const id = Number(byId('editCardId').value);
         const idx = state.tasks.findIndex(t => t.id === id);
@@ -470,19 +481,22 @@ function editBug(b) {
 
 // Evidências
 let currentBugId = null;
+let selectedBug = null;
 
 function bindEvidenceModal() {
     byId('addEvidenceBtn').addEventListener('click', () => {
-        // Encontrar o bug mais recente da tarefa atual
         const currentTaskId = Number(byId('editCardId').value);
         const currentTaskBugs = state.bugs.filter(b => b.taskId === currentTaskId);
         if (currentTaskBugs.length === 0) {
             alert('Adicione um bug primeiro antes de adicionar evidências!');
             return;
         }
-        currentBugId = currentTaskBugs[currentTaskBugs.length - 1].id;
-        openEvidenceModal();
+        openBugSelectionModal(currentTaskBugs);
     });
+
+    // Bind do modal de seleção de bugs
+    byId('closeBugSelectionModal').addEventListener('click', closeBugSelectionModal);
+    byId('cancelBugSelection').addEventListener('click', closeBugSelectionModal);
 
     byId('closeEvidenceModal').addEventListener('click', closeEvidenceModal);
     byId('cancelEvidence').addEventListener('click', closeEvidenceModal);
@@ -492,6 +506,49 @@ function bindEvidenceModal() {
     
     // Bind do input de arquivos para preview
     byId('evidenceFiles').addEventListener('change', handleFileSelection);
+}
+
+function openBugSelectionModal(bugs) {
+    const list = byId('bugSelectionList');
+    list.innerHTML = '';
+    
+    bugs.forEach(bug => {
+        const item = document.createElement('div');
+        item.className = 'bug-selection-item';
+        item.dataset.bugId = bug.id;
+        
+        item.innerHTML = `
+            <h5>${bug.title}</h5>
+            <p class="bug-meta">Prioridade: ${bug.priority} | Status: ${bug.status}</p>
+            ${bug.description ? `<p class="bug-description">${bug.description}</p>` : ''}
+        `;
+        
+        item.addEventListener('click', () => selectBug(bug));
+        list.appendChild(item);
+    });
+    
+    byId('bugSelectionModal').classList.add('show');
+    byId('bugSelectionModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeBugSelectionModal() {
+    byId('bugSelectionModal').classList.remove('show');
+    byId('bugSelectionModal').setAttribute('aria-hidden', 'true');
+    selectedBug = null;
+}
+
+function selectBug(bug) {
+    selectedBug = bug;
+    currentBugId = bug.id;
+    
+    // Atualizar informações do bug selecionado no modal de evidências
+    byId('selectedBugTitle').textContent = bug.title;
+    byId('selectedBugPriority').textContent = bug.priority;
+    byId('selectedBugStatus').textContent = bug.status;
+    
+    // Fechar modal de seleção e abrir modal de evidências
+    closeBugSelectionModal();
+    openEvidenceModal();
 }
 
 function openEvidenceModal() {
@@ -505,6 +562,7 @@ function closeEvidenceModal() {
     byId('evidenceModal').classList.remove('show');
     byId('evidenceModal').setAttribute('aria-hidden', 'true');
     currentBugId = null;
+    selectedBug = null;
 }
 
 function handleFileSelection(e) {

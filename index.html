@@ -83,20 +83,24 @@
             <div class="modal-body">
                 <form id="editCardForm" class="stack-form" autocomplete="off">
                     <input type="hidden" id="editCardId" />
-                    <label>Título
+                    <label>
+                        <strong>Título</strong>
                         <input type="text" id="editCardTitle" required />
                     </label>
-                    <label>Descrição da Tarefa (Requisitos)
-                        <textarea id="editCardDescription" rows="3"></textarea>
+                    <label>
+                        <strong>Descrição da Tarefa</strong>
+                        <textarea id="editCardDescription" rows="3" placeholder="Descreva os requisitos e detalhes da tarefa..."></textarea>
                     </label>
-                    <label>Prioridade
+                    <label>
+                        <strong>Prioridade</strong>
                         <select id="editCardPriority">
                             <option value="Alta">Alta</option>
                             <option value="Média">Média</option>
                             <option value="Baixa">Baixa</option>
                         </select>
                     </label>
-                    <label>Status
+                    <label>
+                        <strong>Status</strong>
                         <select id="editCardStatus">
                             <option value="Backlog">Backlog</option>
                             <option value="Pendente Para Dev">Pendente Para Dev</option>
@@ -113,9 +117,11 @@
                     <h4>Comentários</h4>
                     <ul id="commentsList"></ul>
                     <form id="newCommentForm" class="inline-form" autocomplete="off">
-                        <input type="text" id="commentText" placeholder="Escreva um comentário" required />
-                        <input type="file" id="commentFiles" multiple />
-                        <button type="submit">Adicionar</button>
+                        <div class="comment-input-group">
+                            <input type="text" id="commentText" placeholder="Escreva um comentário..." required />
+                            <input type="file" id="commentFiles" multiple />
+                            <button type="submit">Adicionar</button>
+                        </div>
                     </form>
                 </div>
 
@@ -130,8 +136,8 @@
                     <div id="documentationTab" class="tab-content active">
                         <div class="testcases-section">
                             <h4>Casos de Teste</h4>
-                            <form id="newTestCaseForm" class="inline-form" autocomplete="off">
-                                <textarea id="tcDescription" placeholder="Descreva o caso de teste aqui..." rows="4" style="width: 100%; resize: vertical;"></textarea>
+                            <form id="newTestCaseForm" class="testcase-form" autocomplete="off">
+                                <textarea id="tcDescription" placeholder="Descreva o caso de teste aqui..." rows="4"></textarea>
                                 <button type="submit">Adicionar Caso de Teste</button>
                             </form>
                             <ul id="testCasesList" class="testcases-list"></ul>
@@ -142,21 +148,29 @@
                     <div id="bugsTab" class="tab-content">
                         <div class="bugs-section">
                             <h4>Bugs</h4>
-                            <form id="newBugForm" class="inline-form" autocomplete="off">
-                                <input type="text" id="bugTitle" placeholder="Título do Bug" required />
-                                <input type="text" id="bugDescription" placeholder="Descrição" />
-                                <select id="bugPriority" required>
-                                    <option value="Alta">Alta</option>
-                                    <option value="Média" selected>Média</option>
-                                    <option value="Baixa">Baixa</option>
-                                </select>
-                                <select id="bugStatus">
-                                    <option value="Open" selected>Open</option>
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Closed">Closed</option>
-                                </select>
-                                <button type="submit">Adicionar Bug</button>
-                                <button type="button" id="addEvidenceBtn" class="evidence-btn">📎 Adicionar Evidências</button>
+                            <form id="newBugForm" class="bug-form" autocomplete="off">
+                                <div class="bug-input-row">
+                                    <input type="text" id="bugTitle" placeholder="Título do Bug" required />
+                                    <select id="bugPriority" required>
+                                        <option value="Alta">Alta</option>
+                                        <option value="Média" selected>Média</option>
+                                        <option value="Baixa">Baixa</option>
+                                    </select>
+                                </div>
+                                <div class="bug-description-row">
+                                    <textarea id="bugDescription" placeholder="Descreva o bug aqui..." rows="3"></textarea>
+                                </div>
+                                <div class="bug-input-row">
+                                    <select id="bugStatus">
+                                        <option value="Open" selected>Open</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Closed">Closed</option>
+                                    </select>
+                                </div>
+                                <div class="bug-actions">
+                                    <button type="submit">Adicionar Bug</button>
+                                    <button type="button" id="addEvidenceBtn" class="evidence-btn">📎 Adicionar Evidências</button>
+                                </div>
                             </form>
                             <ul id="bugsList" class="bugs-list"></ul>
                                                  </div>
@@ -202,6 +216,28 @@
         </div>
     </div>
 
+    <!-- Modal de Seleção de Bug -->
+    <div id="bugSelectionModal" class="modal" aria-hidden="true">
+        <div class="modal-content bug-selection-modal">
+            <div class="modal-header">
+                <h3>🐛 Selecionar Bug para Evidências</h3>
+                <button class="close-modal" id="closeBugSelectionModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="bug-selection-section">
+                    <h4>Bugs Disponíveis</h4>
+                    <p class="selection-info">Selecione o bug ao qual deseja adicionar evidências:</p>
+                    <div class="bug-selection-list" id="bugSelectionList">
+                        <!-- Lista de bugs será preenchida dinamicamente -->
+                    </div>
+                    <div class="bug-selection-actions">
+                        <button type="button" class="bug-selection-cancel" id="cancelBugSelection">❌ Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Evidências -->
     <div id="evidenceModal" class="modal" aria-hidden="true">
         <div class="modal-content evidence-modal">
@@ -211,7 +247,10 @@
             </div>
             <div class="modal-body">
                 <div class="evidence-section">
-                    <h4>Selecionar Arquivos</h4>
+                    <div class="selected-bug-info">
+                        <h4>Evidências para: <span id="selectedBugTitle" class="bug-title"></span></h4>
+                        <p class="bug-meta">Prioridade: <span id="selectedBugPriority"></span> | Status: <span id="selectedBugStatus"></span></p>
+                    </div>
                     <p class="evidence-info">Formatos aceitos: Imagens (JPG, PNG, GIF) e Vídeos (MP4, AVI, MOV)</p>
                     <form id="evidenceForm" class="evidence-form" autocomplete="off">
                         <div class="file-upload-area">
