@@ -9,7 +9,20 @@
 <body>
     <header class="app-header">
         <div class="brand">
-            <span class="logo">🌀</span>
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Círculo de fundo -->
+                    <circle cx="16" cy="16" r="15" fill="#87CEEB" stroke="#5F9EA0" stroke-width="1"/>
+                    
+                    <!-- Estrela/Shuriken principal -->
+                    <path d="M16 4 L20 12 L28 16 L20 20 L16 28 L12 20 L4 16 L12 12 Z" fill="#696969"/>
+                    <path d="M16 6 L18.5 12 L24 16 L18.5 20 L16 26 L13.5 20 L8 16 L13.5 12 Z" fill="#808080"/>
+                    <path d="M16 8 L17 12 L20 16 L17 20 L16 24 L15 20 L12 16 L15 12 Z" fill="#A9A9A9"/>
+                    
+                    <!-- Sombra -->
+                    <ellipse cx="20" cy="22" rx="8" ry="3" fill="#4682B4" opacity="0.6"/>
+                </svg>
+            </div>
             <h1>Jiraiya</h1>
         </div>
         <div class="sprint-controls">
@@ -17,6 +30,9 @@
             <input type="date" id="sprintEndDate" />
             <button id="setSprint">Definir</button>
             <div id="sprintCountdown" class="countdown">-- dias restantes</div>
+        </div>
+        <div class="header-actions">
+            <button id="dashboardBtn" class="dashboard-btn">📊 Dashboard</button>
         </div>
     </header>
 
@@ -30,7 +46,7 @@
                 <option value="Média" selected>Média</option>
                 <option value="Baixa">Baixa</option>
             </select>
-            <button type="submit">Adicionar</button>
+            <button type="submit">Adicionar ao Backlog</button>
         </form>
     </section>
 
@@ -38,106 +54,62 @@
         <section class="kanban" aria-label="Quadro Kanban">
             <div class="kanban-column" data-status="Backlog">
                 <div class="kanban-header">Backlog</div>
-                <div class="kanban-dropzone" data-status="Backlog"></div>
+                <div class="kanban-dropzone" data-status="Backlog">
+                    <div class="welcome-card">
+                        <div class="welcome-header">
+                            <div class="welcome-icon">🚀</div>
+                            <h3>Bem-vindo ao Jiraiya!</h3>
+                        </div>
+                        <div class="quick-stats">
+                            <div class="stat-item">
+                                <div class="stat-number" id="welcomeTotalTasks">0</div>
+                                <div class="stat-label">Tarefas</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="welcomeCompletedTasks">0</div>
+                                <div class="stat-label">Concluídas</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="welcomeTestCases">0</div>
+                                <div class="stat-label">Casos de Teste</div>
+                            </div>
+                        </div>
+                        <div class="welcome-tips">
+                            <p>💡 <strong>Dica:</strong> Clique duas vezes em uma tarefa para editar</p>
+                            <p>📊 Use o Dashboard para ver estatísticas do projeto</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="kanban-column" data-status="To Do">
-                <div class="kanban-header">To Do</div>
-                <div class="kanban-dropzone" data-status="To Do"></div>
+            <div class="kanban-column" data-status="Pendente Para Dev">
+                <div class="kanban-header">Pendente Para Dev</div>
+                <div class="kanban-dropzone" data-status="Pendente Para Dev"></div>
             </div>
-            <div class="kanban-column" data-status="In Progress">
-                <div class="kanban-header">In Progress <span class="wip">WIP ≤ 3</span></div>
-                <div class="kanban-dropzone" data-status="In Progress"></div>
+            <div class="kanban-column" data-status="Em Desenvolvimento">
+                <div class="kanban-header">Em Desenvolvimento <span class="wip">WIP ≤ 3</span></div>
+                <div class="kanban-dropzone" data-status="Em Desenvolvimento"></div>
             </div>
-            <div class="kanban-column" data-status="Done">
-                <div class="kanban-header">Done</div>
-                <div class="kanban-dropzone" data-status="Done"></div>
+            <div class="kanban-column" data-status="Code Review">
+                <div class="kanban-header">Code Review</div>
+                <div class="kanban-dropzone" data-status="Code Review"></div>
+            </div>
+            <div class="kanban-column" data-status="Pendente para QA">
+                <div class="kanban-header">Pendente para QA</div>
+                <div class="kanban-dropzone" data-status="Pendente para QA"></div>
+            </div>
+            <div class="kanban-column" data-status="Em Testes">
+                <div class="kanban-header">Em Testes</div>
+                <div class="kanban-dropzone" data-status="Em Testes"></div>
+            </div>
+            <div class="kanban-column" data-status="Pendente de Aprovação">
+                <div class="kanban-header">Pendente de Aprovação</div>
+                <div class="kanban-dropzone" data-status="Pendente de Aprovação"></div>
+            </div>
+            <div class="kanban-column" data-status="Pronto">
+                <div class="kanban-header">Pronto</div>
+                <div class="kanban-dropzone" data-status="Pronto"></div>
             </div>
         </section>
-
-        <aside class="side-panel" aria-label="Painel Lateral">
-            <div class="tabs">
-                <button class="tab-button active" data-tab="docsTab">Documentação</button>
-                <button class="tab-button" data-tab="bugsTab">Bugs</button>
-                <button class="tab-button" data-tab="dashboardTab">Dashboard</button>
-            </div>
-            <div class="tab-content">
-                <section id="docsTab" class="tab-pane active">
-                    <form id="newRequirementForm" class="inline-form" autocomplete="off">
-                        <strong>Novo Requisito</strong>
-                        <input type="text" id="reqTitle" placeholder="Título" required />
-                        <input type="text" id="reqDescription" placeholder="Descrição" />
-                        <button type="submit">Adicionar</button>
-                    </form>
-                    <div class="requirements">
-                        <div class="requirements-list">
-                            <h3>Requisitos</h3>
-                            <ul id="requirementsList"></ul>
-                        </div>
-                        <div class="requirement-details">
-                            <h3>Detalhes do Requisito</h3>
-                            <div id="requirementDetail">
-                                <p>Nenhum requisito selecionado.</p>
-                            </div>
-                            <div class="testcases">
-                                <div class="testcases-header">
-                                    <h4>Casos de Teste</h4>
-                                    <form id="newTestCaseForm" class="inline-form" autocomplete="off">
-                                        <input type="text" id="tcTitle" placeholder="Título do Caso" required />
-                                        <input type="text" id="tcSteps" placeholder="Passos" />
-                                        <button type="submit">Adicionar</button>
-                                    </form>
-                                </div>
-                                <ul id="testCasesList"></ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="bugsTab" class="tab-pane">
-                    <form id="newBugForm" class="inline-form" autocomplete="off">
-                        <strong>Novo Bug</strong>
-                        <input type="text" id="bugTitle" placeholder="Título" required />
-                        <input type="text" id="bugDescription" placeholder="Descrição" />
-                        <select id="bugPriority" required>
-                            <option value="Alta">Alta</option>
-                            <option value="Média" selected>Média</option>
-                            <option value="Baixa">Baixa</option>
-                        </select>
-                        <select id="bugStatus">
-                            <option value="Open" selected>Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Closed">Closed</option>
-                        </select>
-                        <button type="submit">Adicionar</button>
-                    </form>
-                    <div class="bugs-list">
-                        <h3>Lista de Bugs</h3>
-                        <ul id="bugsList"></ul>
-                    </div>
-                </section>
-
-                <section id="dashboardTab" class="tab-pane">
-                    <div class="metrics">
-                        <div class="metric">
-                            <div class="metric-title">Casos Executados</div>
-                            <div class="metric-value" id="metricTests">0%</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-title">Bugs (Abertos / Fechados)</div>
-                            <div class="metric-value" id="metricBugs">0 / 0</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-title">Tarefas (Done / Total)</div>
-                            <div class="metric-value" id="metricTasks">0 / 0</div>
-                        </div>
-                    </div>
-                    <div class="chart">
-                        <h3>Burn-down simples (Concluídas vs. Pendentes)</h3>
-                        <canvas id="burndownCanvas" width="360" height="200"></canvas>
-                    </div>
-                </section>
-            </div>
-        </aside>
     </main>
 
     <div id="cardModal" class="modal" aria-hidden="true">
@@ -149,40 +121,350 @@
             <div class="modal-body">
                 <form id="editCardForm" class="stack-form" autocomplete="off">
                     <input type="hidden" id="editCardId" />
-                    <label>Título
+                    <label>
+                        <strong>Título</strong>
                         <input type="text" id="editCardTitle" required />
                     </label>
-                    <label>Descrição
-                        <textarea id="editCardDescription" rows="3"></textarea>
+                    <label>
+                        <strong>Descrição da Tarefa</strong>
+                        <textarea id="editCardDescription" rows="3" placeholder="Descreva os requisitos e detalhes da tarefa..."></textarea>
                     </label>
-                    <label>Prioridade
+                    <label>
+                        <strong>Prioridade</strong>
                         <select id="editCardPriority">
                             <option value="Alta">Alta</option>
                             <option value="Média">Média</option>
                             <option value="Baixa">Baixa</option>
                         </select>
                     </label>
-                    <label>Status
+                    <label>
+                        <strong>Status</strong>
                         <select id="editCardStatus">
                             <option value="Backlog">Backlog</option>
-                            <option value="To Do">To Do</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Done">Done</option>
+                            <option value="Pendente Para Dev">Pendente Para Dev</option>
+                            <option value="Em Desenvolvimento">Em Desenvolvimento</option>
+                            <option value="Code Review">Code Review</option>
+                            <option value="Pendente para QA">Pendente para QA</option>
+                            <option value="Em Testes">Em Testes</option>
+                            <option value="Pendente de Aprovação">Pendente de Aprovação</option>
+                            <option value="Pronto">Pronto</option>
                         </select>
                     </label>
-                    <div class="modal-actions">
-                        <button type="submit">Salvar</button>
-                        <button type="button" id="deleteCard" class="danger">Excluir</button>
-                    </div>
-                </form>
-                <div class="comments">
+                    <label>
+                        <strong>Tipo da Tarefa</strong>
+                        <select id="editCardType" required>
+                            <option value="Feature">🚀 Feature</option>
+                            <option value="Bug">🐛 Bug</option>
+                            <option value="Melhoria">⚡ Melhoria</option>
+                        </select>
+                    </label>
+                                     </form>
+                 <div class="comments">
                     <h4>Comentários</h4>
                     <ul id="commentsList"></ul>
                     <form id="newCommentForm" class="inline-form" autocomplete="off">
-                        <input type="text" id="commentText" placeholder="Escreva um comentário" required />
-                        <input type="file" id="commentFiles" multiple />
-                        <button type="submit">Adicionar</button>
+                        <div class="comment-input-group">
+                            <input type="text" id="commentText" placeholder="Escreva um comentário..." required />
+                            <input type="file" id="commentFiles" multiple />
+                            <button type="submit">Adicionar</button>
+                        </div>
                     </form>
+                </div>
+
+                <!-- Abas de Documentação e Bugs -->
+                <div class="modal-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="documentation">📋 Documentação</button>
+                        <button class="tab-btn" data-tab="bugs">🐛 Bugs</button>
+                    </div>
+                    
+                    <!-- Aba de Documentação -->
+                    <div id="documentationTab" class="tab-content active">
+                        <div class="testcases-section">
+                            <h4>Casos de Teste</h4>
+                            <form id="newTestCaseForm" class="testcase-form" autocomplete="off">
+                                <textarea id="tcDescription" placeholder="Descreva o caso de teste aqui..." rows="4"></textarea>
+                                <button type="submit">Adicionar Caso de Teste</button>
+                            </form>
+                            <ul id="testCasesList" class="testcases-list"></ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Aba de Bugs -->
+                    <div id="bugsTab" class="tab-content">
+                        <div class="bugs-section">
+                            <h4>Bugs</h4>
+                            <form id="newBugForm" class="bug-form" autocomplete="off">
+                                <div class="bug-input-row">
+                                    <input type="text" id="bugTitle" placeholder="Título do Bug" required />
+                                    <select id="bugPriority" required>
+                                        <option value="Alta">Alta</option>
+                                        <option value="Média" selected>Média</option>
+                                        <option value="Baixa">Baixa</option>
+                                    </select>
+                                </div>
+                                <div class="bug-description-row">
+                                    <textarea id="bugDescription" placeholder="Descreva o bug aqui..." rows="3"></textarea>
+                                </div>
+                                <div class="bug-input-row">
+                                    <select id="bugStatus">
+                                        <option value="Open" selected>Open</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Closed">Closed</option>
+                                    </select>
+                                </div>
+                                <div class="bug-actions">
+                                    <button type="submit">Adicionar Bug</button>
+                                    <button type="button" id="addEvidenceBtn" class="evidence-btn">📎 Adicionar Evidências</button>
+                                </div>
+                            </form>
+                            <ul id="bugsList" class="bugs-list"></ul>
+                                                 </div>
+                     </div>
+                 </div>
+                 
+                 <!-- Botões de Ação na parte de baixo -->
+                 <div class="modal-actions-bottom">
+                     <button type="submit" form="editCardForm">Salvar</button>
+                     <button type="button" id="deleteCard" class="danger">Excluir</button>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+    <!-- Modal do Dashboard -->
+    <div id="dashboardModal" class="modal" aria-hidden="true">
+        <div class="modal-content dashboard-modal">
+            <div class="modal-header">
+                <h3>📊 Dashboard - Estatísticas do Projeto</h3>
+                <button class="close-modal" id="closeDashboardModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-title">Casos Executados</div>
+                        <div class="metric-value" id="dashboardMetricTests">0%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Bugs (Abertos / Fechados)</div>
+                        <div class="metric-value" id="dashboardMetricBugs">0 / 0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Tarefas (Done / Total)</div>
+                        <div class="metric-value" id="dashboardMetricTasks">0 / 0</div>
+                    </div>
+                </div>
+                <div class="chart">
+                    <h3>Burn-down simples (Concluídas vs. Pendentes)</h3>
+                    <canvas id="dashboardBurndownCanvas" width="360" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Caso de Teste -->
+    <div id="editTestCaseModal" class="modal" aria-hidden="true">
+        <div class="modal-content edit-testcase-modal">
+            <div class="modal-header">
+                <h3>✏️ Editar Caso de Teste</h3>
+                <button class="close-modal" id="closeEditTestCaseModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-testcase-section">
+                    <form id="editTestCaseForm" class="edit-testcase-form" autocomplete="off">
+                        <label>
+                            <strong>Descrição do Caso de Teste</strong>
+                            <textarea id="editTestCaseDescription" placeholder="Descreva o caso de teste aqui..." rows="4" required></textarea>
+                        </label>
+                        <div class="edit-testcase-actions">
+                            <button type="submit" class="edit-testcase-save">✅ Salvar</button>
+                            <button type="button" class="edit-testcase-cancel" id="cancelEditTestCase">❌ Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Bug -->
+    <div id="editBugModal" class="modal" aria-hidden="true">
+        <div class="modal-content edit-bug-modal">
+            <div class="modal-header">
+                <h3>🐛 Editar Bug</h3>
+                <button class="close-modal" id="closeEditBugModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-bug-section">
+                    <form id="editBugForm" class="edit-bug-form" autocomplete="off">
+                        <label>
+                            <strong>Título do Bug</strong>
+                            <input type="text" id="editBugTitle" placeholder="Título do bug" required />
+                        </label>
+                        <label>
+                            <strong>Descrição</strong>
+                            <textarea id="editBugDescription" placeholder="Descreva o bug aqui..." rows="3"></textarea>
+                        </label>
+                        <div class="edit-bug-row">
+                            <label>
+                                <strong>Prioridade</strong>
+                                <select id="editBugPriority" required>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Média">Média</option>
+                                    <option value="Baixa">Baixa</option>
+                                </select>
+                            </label>
+                            <label>
+                                <strong>Status</strong>
+                                <select id="editBugStatus">
+                                    <option value="Open">Open</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="edit-bug-actions">
+                            <button type="submit" class="edit-bug-save">✅ Salvar</button>
+                            <button type="button" class="edit-bug-cancel" id="cancelEditBug">❌ Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Comentário -->
+    <div id="editCommentModal" class="modal" aria-hidden="true">
+        <div class="modal-content edit-comment-modal">
+            <div class="modal-header">
+                <h3>💬 Editar Comentário</h3>
+                <button class="close-modal" id="closeEditCommentModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-comment-section">
+                    <form id="editCommentForm" class="edit-comment-form" autocomplete="off">
+                        <label>
+                            <strong>Texto do Comentário</strong>
+                            <textarea id="editCommentText" placeholder="Digite o comentário aqui..." rows="4" required></textarea>
+                        </label>
+                        <div class="edit-comment-actions">
+                            <button type="submit" class="edit-comment-save">✅ Salvar</button>
+                            <button type="button" class="edit-comment-cancel" id="cancelEditComment">❌ Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Bug -->
+    <div id="bugSelectionModal" class="modal" aria-hidden="true">
+        <div class="modal-content bug-selection-modal">
+            <div class="modal-header">
+                <h3>🐛 Selecionar Bug para Evidências</h3>
+                <button class="close-modal" id="closeBugSelectionModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="bug-selection-section">
+                    <h4>Bugs Disponíveis</h4>
+                    <p class="selection-info">Selecione o bug ao qual deseja adicionar evidências:</p>
+                    <div class="bug-selection-list" id="bugSelectionList">
+                        <!-- Lista de bugs será preenchida dinamicamente -->
+                    </div>
+                    <div class="bug-selection-actions">
+                        <button type="button" class="bug-selection-cancel" id="cancelBugSelection">❌ Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Evidências -->
+    <div id="evidenceModal" class="modal" aria-hidden="true">
+        <div class="modal-content evidence-modal">
+            <div class="modal-header">
+                <h3>📎 Adicionar Evidências</h3>
+                <button class="close-modal" id="closeEvidenceModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="evidence-section">
+                    <div class="selected-bug-info">
+                        <h4>Evidências para: <span id="selectedBugTitle" class="bug-title"></span></h4>
+                        <p class="bug-meta">Prioridade: <span id="selectedBugPriority"></span> | Status: <span id="selectedBugStatus"></span></p>
+                    </div>
+                    <p class="evidence-info">Formatos aceitos: Imagens (JPG, PNG, GIF) e Vídeos (MP4, AVI, MOV)</p>
+                    <form id="evidenceForm" class="evidence-form" autocomplete="off">
+                        <div class="file-upload-area">
+                            <input type="file" id="evidenceFiles" multiple accept="image/*,video/*" />
+                            <div class="upload-placeholder">
+                                <span class="upload-icon">📁</span>
+                                <p>Clique para selecionar arquivos ou arraste e solte aqui</p>
+                                <p class="upload-hint">Máximo 5 arquivos por evidência</p>
+                            </div>
+                        </div>
+                        <div class="evidence-preview" id="evidencePreview"></div>
+                        <div class="evidence-actions">
+                            <button type="submit" class="evidence-submit">✅ Salvar Evidências</button>
+                            <button type="button" class="evidence-cancel" id="cancelEvidence">❌ Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="deleteConfirmModal" class="modal" aria-hidden="true">
+        <div class="modal-content delete-confirm-modal">
+            <div class="modal-header">
+                <h3>🗑️ Confirmar Exclusão</h3>
+                <button class="close-modal" id="closeDeleteConfirmModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-confirm-section">
+                    <div class="delete-warning">
+                        <span class="warning-icon">⚠️</span>
+                        <h4>Tem certeza que deseja excluir esta tarefa?</h4>
+                        <p class="delete-task-info">A tarefa "<span id="deleteTaskTitle" class="task-title"></span>" será removida permanentemente.</p>
+                        <p class="delete-note">Esta ação não pode ser desfeita.</p>
+                    </div>
+                    <div class="delete-confirm-actions">
+                        <button type="button" class="delete-confirm-btn danger" id="confirmDelete">🗑️ Sim, Excluir</button>
+                        <button type="button" class="delete-cancel-btn" id="cancelDelete">❌ Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso para Evidências -->
+    <div id="evidenceSuccessModal" class="modal" aria-hidden="true">
+        <div class="modal-content evidence-success-modal">
+            <div class="modal-header">
+                <h3>✅ Evidências Salvas com Sucesso!</h3>
+                <button class="close-modal" id="closeEvidenceSuccessModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="evidence-success-section">
+                    <div class="success-icon">🎉</div>
+                    <h4>Evidências adicionadas com sucesso!</h4>
+                    <p class="success-message">As evidências foram anexadas ao bug "<span id="successBugTitle" class="bug-title"></span>".</p>
+                    <div class="evidence-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Bug:</span>
+                            <span class="summary-value" id="successBugName"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Prioridade:</span>
+                            <span class="summary-value" id="successBugPriority"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Status:</span>
+                            <span class="summary-value" id="successBugStatus"></span>
+                        </div>
+                    </div>
+                    <div class="evidence-success-actions">
+                        <button type="button" class="evidence-success-close" id="closeEvidenceSuccess">✅ Fechar</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,12 +472,54 @@
 
     <template id="cardTemplate">
         <div class="card" draggable="true">
-            <div class="card-title"></div>
+            <div class="card-header">
+                <div class="card-title"></div>
+                <div class="card-menu">
+                    <button class="menu-trigger" aria-label="Menu da tarefa">⋮</button>
+                    <div class="menu-dropdown">
+                        <button class="menu-item edit-task">✏️ Editar</button>
+                        <button class="menu-item delete-task danger">🗑️ Deletar</button>
+                    </div>
+                </div>
+            </div>
             <div class="card-meta">
-                <span class="priority"></span>
+                <div class="card-tags">
+                    <span class="card-type"></span>
+                    <span class="priority"></span>
+                </div>
+                <span class="card-status"></span>
             </div>
         </div>
     </template>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>🚀 Jiraiya</h4>
+                <p>Plataforma de gestão de projetos com metodologia Kanban</p>
+            </div>
+            <div class="footer-section">
+                <h4>📋 Funcionalidades</h4>
+                <ul>
+                    <li>Gestão de tarefas com drag & drop</li>
+                    <li>Documentação de casos de teste</li>
+                    <li>Controle de bugs e evidências</li>
+                    <li>Dashboard com métricas</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>⚡ Atalhos</h4>
+                <ul>
+                    <li>Duplo clique: Editar tarefa</li>
+                    <li>Arrastar: Mover entre colunas</li>
+                    <li>⋮ Menu: Ações rápidas</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Jiraiya - Desenvolvido com ❤️ para equipes ágeis</p>
+        </div>
+    </footer>
 
     <script src="app.js"></script>
     <noscript>Ative o JavaScript para utilizar o Jiraiya.</noscript>

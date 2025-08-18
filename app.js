@@ -1,8 +1,8 @@
 // Estado em memória
 const state = {
     tasks: [], // {id, title, description, priority, status, comments: [{text, files: [name]}]}
-    requirements: [], // {id, title, description, testCases: [{id, title, steps, executed:boolean}]}
-    bugs: [], // {id, title, description, priority, status}
+    testCases: [], // {id, description, executed: boolean, taskId: number}
+    bugs: [], // {id, title, description, priority, status, evidence: [{id, files: [name], type: string}]}
     sprintEnd: null,
     seq: 1,
 };
@@ -18,18 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
     bindSprintControls();
     bindNewTaskForm();
     bindKanbanDropzones();
-    bindRequirementForms();
+    bindTestCaseForm();
     bindBugForm();
+    bindEvidenceModal();
     bindModal();
     renderAll();
 });
 
 function renderAll() {
     renderKanban();
-    renderRequirementsList();
+    renderTestCasesList();
     renderBugsList();
     updateMetrics();
-    drawBurndown();
 }
 
 // Tabs painel lateral
@@ -57,7 +57,6 @@ function bindSprintControls() {
         if (Number.isNaN(d.getTime())) return;
         state.sprintEnd = d;
         updateCountdown(countdown);
-        drawBurndown();
     });
     setInterval(() => updateCountdown(countdown), 60 * 1000);
     updateCountdown(countdown);
@@ -80,35 +79,129 @@ function bindNewTaskForm() {
         const description = byId('taskDescription').value.trim();
         const priority = byId('taskPriority').value;
         if (!title) return;
-        state.tasks.push({ id: nextId(), title, description, priority, status: 'Backlog', comments: [] });
+        state.tasks.push({ id: nextId(), title, description, priority, status: 'Backlog', type: 'Feature', comments: [] });
         form.reset();
         renderKanban();
         updateMetrics();
-        drawBurndown();
     });
 }
 
 function renderKanban() {
-    const statuses = ['Backlog', 'To Do', 'In Progress', 'Done'];
+    const statuses = ['Backlog', 'Pendente Para Dev', 'Em Desenvolvimento', 'Code Review', 'Pendente para QA', 'Em Testes', 'Pendente de Aprovação', 'Pronto'];
     statuses.forEach((st) => {
         const zone = document.querySelector(`.kanban-dropzone[data-status="${st}"]`);
         if (!zone) return;
         zone.innerHTML = '';
+        
+        // Se for a coluna Backlog e não houver tarefas, mostrar card de boas-vindas
+        if (st === 'Backlog' && state.tasks.filter(t => t.status === st).length === 0) {
+            const welcomeCard = createWelcomeCard();
+            zone.appendChild(welcomeCard);
+        }
+        
         state.tasks.filter(t => t.status === st).forEach(task => {
             const card = buildCard(task);
             zone.appendChild(card);
         });
     });
+    
+    // Atualizar estatísticas do card de boas-vindas
+    updateWelcomeStats();
+}
+
+// Função para criar o card de boas-vindas
+function createWelcomeCard() {
+    const welcomeDiv = document.createElement('div');
+    welcomeDiv.className = 'welcome-card';
+    welcomeDiv.innerHTML = `
+        <div class="welcome-header">
+            <div class="welcome-icon">🚀</div>
+            <h3>Bem-vindo ao Jiraiya!</h3>
+        </div>
+        <div class="quick-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="welcomeTotalTasks">0</div>
+                <div class="stat-label">Tarefas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="welcomeCompletedTasks">0</div>
+                <div class="stat-label">Concluídas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="welcomeTestCases">0</div>
+                <div class="stat-label">Casos de Teste</div>
+            </div>
+        </div>
+        <div class="welcome-tips">
+            <p>💡 <strong>Dica:</strong> Clique duas vezes em uma tarefa para editar</p>
+            <p>📊 Use o Dashboard para ver estatísticas do projeto</p>
+        </div>
+    `;
+    return welcomeDiv;
+}
+
+// Função para atualizar as estatísticas do card de boas-vindas
+function updateWelcomeStats() {
+    const totalTasks = state.tasks.length;
+    const completedTasks = state.tasks.filter(t => t.status === 'Pronto').length;
+    const totalTestCases = state.testCases.length;
+    
+    // Atualizar elementos se existirem
+    const totalTasksEl = document.getElementById('welcomeTotalTasks');
+    const completedTasksEl = document.getElementById('welcomeCompletedTasks');
+    const testCasesEl = document.getElementById('welcomeTestCases');
+    
+    if (totalTasksEl) totalTasksEl.textContent = totalTasks;
+    if (completedTasksEl) completedTasksEl.textContent = completedTasks;
+    if (testCasesEl) testCasesEl.textContent = totalTestCases;
 }
 
 function buildCard(task) {
     const tmpl = byId('cardTemplate');
     const node = tmpl.content.firstElementChild.cloneNode(true);
     node.dataset.id = task.id;
+    
+    // Configurar título e tipo da tarefa
     node.querySelector('.card-title').textContent = task.title;
+    node.querySelector('.card-type').textContent = task.type || 'Feature';
+    node.querySelector('.card-type').className = `card-type ${task.type || 'Feature'}`;
+    
+    // Configurar prioridade e status
     const pr = node.querySelector('.priority');
     pr.textContent = task.priority;
     pr.classList.add(task.priority);
+    
+    node.querySelector('.card-status').textContent = task.status;
+    
+    // Configurar menu de ações
+    const menuTrigger = node.querySelector('.menu-trigger');
+    const menuDropdown = node.querySelector('.menu-dropdown');
+    
+    // Toggle do menu
+    menuTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuDropdown.classList.toggle('show');
+    });
+    
+    // Botão editar
+    const editBtn = node.querySelector('.edit-task');
+    editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openCardModal(task.id);
+    });
+    
+    // Botão deletar
+    const deleteBtn = node.querySelector('.delete-task');
+    deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openDeleteConfirmModal(task);
+    });
+    
+    // Fechar menu ao clicar fora
+    document.addEventListener('click', () => {
+        menuDropdown.classList.remove('show');
+    });
+    
     node.addEventListener('dragstart', onDragStartCard);
     node.addEventListener('dblclick', () => openCardModal(task.id));
     return node;
@@ -129,17 +222,16 @@ function bindKanbanDropzones() {
             const task = state.tasks.find(t => t.id === id);
             if (!task) return;
             const targetStatus = z.dataset.status;
-            if (targetStatus === 'In Progress') {
-                const wip = state.tasks.filter(t => t.status === 'In Progress').length;
-                if (task.status !== 'In Progress' && wip >= 3) {
-                    alert('Limite de WIP atingido (3). Mova algo para Done antes.');
+            if (targetStatus === 'Em Desenvolvimento') {
+                const wip = state.tasks.filter(t => t.status === 'Em Desenvolvimento').length;
+                if (task.status !== 'Em Desenvolvimento' && wip >= 3) {
+                    alert('Limite de WIP atingido (3). Mova algo para Code Review antes.');
                     return;
                 }
             }
             task.status = targetStatus;
             renderKanban();
             updateMetrics();
-            drawBurndown();
         });
     });
 }
@@ -152,6 +244,36 @@ function onDragStartCard(e) {
 // Modal de edição de card + comentários
 function bindModal() {
     byId('closeCardModal').addEventListener('click', closeCardModal);
+    byId('closeDashboardModal').addEventListener('click', closeDashboardModal);
+    byId('dashboardBtn').addEventListener('click', openDashboardModal);
+    
+    // Bind do modal de confirmação de exclusão
+    byId('closeDeleteConfirmModal').addEventListener('click', closeDeleteConfirmModal);
+    byId('cancelDelete').addEventListener('click', closeDeleteConfirmModal);
+    byId('confirmDelete').addEventListener('click', handleConfirmDelete);
+    
+    // Bind das abas do modal
+    bindModalTabs();
+    
+    // Bind dos formulários de documentação e bugs
+    bindTestCaseForm();
+    bindBugForm();
+    
+    // Fechar modal clicando fora
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal') && e.target.classList.contains('show')) {
+            if (e.target.id === 'cardModal') closeCardModal();
+            else if (e.target.id === 'dashboardModal') closeDashboardModal();
+            else if (e.target.id === 'evidenceModal') closeEvidenceModal();
+            else if (e.target.id === 'bugSelectionModal') closeBugSelectionModal();
+            else if (e.target.id === 'editTestCaseModal') closeEditTestCaseModal();
+            else if (e.target.id === 'editBugModal') closeEditBugModal();
+                    else if (e.target.id === 'editCommentModal') closeEditCommentModal();
+        else if (e.target.id === 'deleteConfirmModal') closeDeleteConfirmModal();
+        else if (e.target.id === 'evidenceSuccessModal') closeEvidenceSuccessModal();
+    }
+});
+    
     byId('deleteCard').addEventListener('click', () => {
         const id = Number(byId('editCardId').value);
         const idx = state.tasks.findIndex(t => t.id === id);
@@ -159,7 +281,6 @@ function bindModal() {
         closeCardModal();
         renderKanban();
         updateMetrics();
-        drawBurndown();
     });
     byId('editCardForm').addEventListener('submit', (e) => {
         e.preventDefault();
@@ -167,9 +288,9 @@ function bindModal() {
         const t = state.tasks.find(x => x.id === id);
         if (!t) return;
         const targetStatus = byId('editCardStatus').value;
-        if (targetStatus === 'In Progress') {
-            const wip = state.tasks.filter(x => x.status === 'In Progress').length;
-            if (t.status !== 'In Progress' && wip >= 3) {
+        if (targetStatus === 'Em Desenvolvimento') {
+            const wip = state.tasks.filter(x => x.status === 'Em Desenvolvimento').length;
+            if (t.status !== 'Em Desenvolvimento' && wip >= 3) {
                 alert('Limite de WIP atingido (3).');
                 return;
             }
@@ -178,9 +299,9 @@ function bindModal() {
         t.description = byId('editCardDescription').value.trim();
         t.priority = byId('editCardPriority').value;
         t.status = targetStatus;
+        t.type = byId('editCardType').value;
         renderKanban();
         updateMetrics();
-        drawBurndown();
         closeCardModal();
     });
     byId('newCommentForm').addEventListener('submit', (e) => {
@@ -207,7 +328,13 @@ function openCardModal(id) {
     byId('editCardDescription').value = t.description || '';
     byId('editCardPriority').value = t.priority;
     byId('editCardStatus').value = t.status;
+    byId('editCardType').value = t.type || 'Feature';
     renderComments(t);
+    
+    // Renderizar casos de teste e bugs da tarefa
+    renderTestCasesList();
+    renderBugsList();
+    
     byId('cardModal').classList.add('show');
     byId('cardModal').setAttribute('aria-hidden', 'false');
 }
@@ -215,6 +342,73 @@ function openCardModal(id) {
 function closeCardModal() {
     byId('cardModal').classList.remove('show');
     byId('cardModal').setAttribute('aria-hidden', 'true');
+}
+
+// Variável global para armazenar a tarefa a ser excluída
+let taskToDelete = null;
+
+function openDeleteConfirmModal(task) {
+    taskToDelete = task;
+    byId('deleteTaskTitle').textContent = task.title;
+    byId('deleteConfirmModal').classList.add('show');
+    byId('deleteConfirmModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeDeleteConfirmModal() {
+    byId('deleteConfirmModal').classList.remove('show');
+    byId('deleteConfirmModal').setAttribute('aria-hidden', 'true');
+    taskToDelete = null;
+}
+
+function handleConfirmDelete() {
+    if (taskToDelete) {
+        const idx = state.tasks.findIndex(t => t.id === taskToDelete.id);
+        if (idx >= 0) {
+            state.tasks.splice(idx, 1);
+            renderKanban();
+            updateMetrics();
+        }
+        closeDeleteConfirmModal();
+    }
+}
+
+
+
+function bindModalTabs() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            
+            // Remover classe active de todos os botões e conteúdos
+            tabButtons.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Adicionar classe active ao botão clicado
+            btn.classList.add('active');
+            
+            // Mostrar conteúdo da aba correspondente
+            if (targetTab === 'documentation') {
+                byId('documentationTab').classList.add('active');
+            } else if (targetTab === 'bugs') {
+                byId('bugsTab').classList.add('active');
+            }
+        });
+    });
+}
+
+function openDashboardModal() {
+    updateDashboardMetrics();
+    drawDashboardBurndown();
+    byId('dashboardModal').classList.add('show');
+    byId('dashboardModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeDashboardModal() {
+    byId('dashboardModal').classList.remove('show');
+    byId('dashboardModal').setAttribute('aria-hidden', 'true');
 }
 
 function renderComments(task) {
@@ -234,6 +428,12 @@ function renderComments(task) {
         }
         const actions = document.createElement('div');
         actions.className = 'row-actions';
+        
+        const edit = document.createElement('button');
+        edit.className = 'icon-btn';
+        edit.textContent = 'Editar';
+        edit.addEventListener('click', () => openEditCommentModal(c, task));
+        
         const del = document.createElement('button');
         del.className = 'icon-btn danger';
         del.textContent = 'Excluir';
@@ -241,129 +441,85 @@ function renderComments(task) {
             const i = task.comments.indexOf(c);
             if (i >= 0) { task.comments.splice(i, 1); renderComments(task); }
         });
+        
+        actions.appendChild(edit);
         actions.appendChild(del);
         li.appendChild(actions);
         ul.appendChild(li);
     });
 }
 
-// Requisitos e Casos de Teste
-let selectedRequirementId = null;
-
-function bindRequirementForms() {
-    const form = byId('newRequirementForm');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const title = byId('reqTitle').value.trim();
-        const description = byId('reqDescription').value.trim();
-        if (!title) return;
-        const req = { id: nextId(), title, description, testCases: [] };
-        state.requirements.push(req);
-        form.reset();
-        renderRequirementsList();
-    });
+// Casos de Teste
+function bindTestCaseForm() {
     const tcForm = byId('newTestCaseForm');
     tcForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (!selectedRequirementId) return;
-        const req = state.requirements.find(r => r.id === selectedRequirementId);
-        if (!req) return;
-        const title = byId('tcTitle').value.trim();
-        const steps = byId('tcSteps').value.trim();
-        if (!title) return;
-        req.testCases.push({ id: nextId(), title, steps, executed: false });
+        const description = byId('tcDescription').value.trim();
+        if (!description) return;
+        
+        const currentTaskId = Number(byId('editCardId').value);
+        const testCase = { id: nextId(), description, executed: false, taskId: currentTaskId };
+        state.testCases.push(testCase);
         tcForm.reset();
-        renderRequirementDetail(req);
+        renderTestCasesList();
         updateMetrics();
-        drawBurndown();
     });
 }
 
-function renderRequirementsList() {
-    const ul = byId('requirementsList');
-    ul.innerHTML = '';
-    state.requirements.forEach((r) => {
-        const li = document.createElement('li');
-        if (r.id === selectedRequirementId) li.classList.add('active');
-        const row = document.createElement('div');
-        row.className = 'row';
-        const title = document.createElement('div');
-        title.textContent = r.title;
-        title.style.cursor = 'pointer';
-        title.addEventListener('click', () => { selectedRequirementId = r.id; renderRequirementsList(); });
-        const actions = document.createElement('div');
-        actions.className = 'row-actions';
-        const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
-        edit.addEventListener('click', () => editRequirement(r));
-        const del = document.createElement('button'); del.className = 'icon-btn danger'; del.textContent = 'Excluir';
-        del.addEventListener('click', () => { deleteRequirement(r.id); });
-        actions.appendChild(edit); actions.appendChild(del);
-        row.appendChild(title); row.appendChild(actions);
-        const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = r.description || '(sem descrição)';
-        li.appendChild(row); li.appendChild(desc);
-        ul.appendChild(li);
-    });
-    const detailHost = byId('requirementDetail');
-    const req = state.requirements.find(r => r.id === selectedRequirementId) || null;
-    if (req) renderRequirementDetail(req); else detailHost.innerHTML = '<p>Nenhum requisito selecionado.</p>';
-}
-
-function editRequirement(req) {
-    const title = prompt('Editar título do requisito', req.title);
-    if (title === null) return;
-    const description = prompt('Editar descrição', req.description || '');
-    if (description === null) return;
-    req.title = title.trim() || req.title;
-    req.description = description.trim();
-    renderRequirementsList();
-}
-
-function deleteRequirement(id) {
-    const idx = state.requirements.findIndex(r => r.id === id);
-    if (idx >= 0) state.requirements.splice(idx, 1);
-    if (selectedRequirementId === id) selectedRequirementId = null;
-    renderRequirementsList();
-    updateMetrics();
-    drawBurndown();
-}
-
-function renderRequirementDetail(req) {
-    const host = byId('requirementDetail');
-    host.innerHTML = '';
-    const title = document.createElement('h4'); title.textContent = req.title;
-    const desc = document.createElement('p'); desc.textContent = req.description || '(sem descrição)';
-    host.appendChild(title); host.appendChild(desc);
-    renderTestCases(req);
-}
-
-function renderTestCases(req) {
+function renderTestCasesList() {
     const ul = byId('testCasesList');
     ul.innerHTML = '';
-    req.testCases.forEach(tc => {
-        const li = document.createElement('li'); li.className = 'testcase';
-        const row = document.createElement('div'); row.className = 'row';
-        const title = document.createElement('div');
-        title.textContent = `${tc.title} ${tc.executed ? '(executado)' : ''}`;
-        const actions = document.createElement('div'); actions.className = 'row-actions';
-        const toggle = document.createElement('button'); toggle.className = 'icon-btn'; toggle.textContent = tc.executed ? 'Desmarcar' : 'Executado';
-        toggle.addEventListener('click', () => { tc.executed = !tc.executed; renderTestCases(req); updateMetrics(); drawBurndown(); });
-        const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
-        edit.addEventListener('click', () => {
-            const t = prompt('Editar título do caso', tc.title);
-            if (t === null) return;
-            const s = prompt('Editar passos', tc.steps || '');
-            if (s === null) return;
-            tc.title = t.trim() || tc.title; tc.steps = s.trim(); renderTestCases(req);
+    
+    // Filtrar casos de teste da tarefa atual
+    const currentTaskId = Number(byId('editCardId').value);
+    const taskTestCases = state.testCases.filter(tc => tc.taskId === currentTaskId);
+    
+    taskTestCases.forEach((tc) => {
+        const li = document.createElement('li');
+        li.className = 'testcase';
+        const row = document.createElement('div');
+        row.className = 'row';
+        const description = document.createElement('div');
+        description.textContent = tc.description;
+        const actions = document.createElement('div');
+        actions.className = 'row-actions';
+        const toggle = document.createElement('button'); 
+        toggle.className = 'icon-btn'; 
+        toggle.textContent = tc.executed ? 'Desmarcar' : 'Executado';
+        toggle.addEventListener('click', () => { 
+            tc.executed = !tc.executed; 
+            renderTestCasesList(); 
+            updateMetrics(); 
         });
-        const del = document.createElement('button'); del.className = 'icon-btn danger'; del.textContent = 'Excluir';
-        del.addEventListener('click', () => { const i = req.testCases.findIndex(x => x.id === tc.id); if (i>=0) req.testCases.splice(i,1); renderTestCases(req); updateMetrics(); drawBurndown(); });
+        const edit = document.createElement('button'); 
+        edit.className = 'icon-btn'; 
+        edit.textContent = 'Editar';
+        edit.addEventListener('click', () => openEditTestCaseModal(tc));
+        const del = document.createElement('button'); 
+        del.className = 'icon-btn danger'; 
+        del.textContent = 'Excluir';
+        del.addEventListener('click', () => { 
+            const i = state.testCases.findIndex(x => x.id === tc.id); 
+            if (i >= 0) state.testCases.splice(i, 1); 
+            renderTestCasesList(); 
+            updateMetrics(); 
+        });
         actions.appendChild(toggle); actions.appendChild(edit); actions.appendChild(del);
-        row.appendChild(title); row.appendChild(actions);
-        const steps = document.createElement('div'); steps.className = 'small'; steps.textContent = tc.steps || '(sem passos)';
-        li.appendChild(row); li.appendChild(steps);
+        row.appendChild(description); row.appendChild(actions);
+        li.appendChild(row);
+        
+        // Mostrar status de execução
+        const status = document.createElement('div'); 
+        status.className = 'small'; 
+        status.textContent = tc.executed ? '✅ Executado' : '⏳ Pendente';
+        status.style.marginTop = '8px';
+        li.appendChild(status);
+        
         ul.appendChild(li);
     });
 }
+
+
 
 // Bugs
 function bindBugForm() {
@@ -375,56 +531,390 @@ function bindBugForm() {
         const priority = byId('bugPriority').value;
         const status = byId('bugStatus').value;
         if (!title) return;
-        state.bugs.push({ id: nextId(), title, description, priority, status });
+        
+        const currentTaskId = Number(byId('editCardId').value);
+        state.bugs.push({ id: nextId(), title, description, priority, status, taskId: currentTaskId, evidence: [] });
         form.reset();
         renderBugsList();
         updateMetrics();
-        drawBurndown();
     });
 }
 
 function renderBugsList() {
     const ul = byId('bugsList');
     ul.innerHTML = '';
-    state.bugs.forEach(b => {
-        const li = document.createElement('li'); li.className = 'bug-item';
-        const row = document.createElement('div'); row.className = 'row';
-        const title = document.createElement('div'); title.textContent = `${b.title} [${b.priority}]`;
-        const actions = document.createElement('div'); actions.className = 'row-actions';
-        const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
-        edit.addEventListener('click', () => editBug(b));
-        const del = document.createElement('button'); del.className = 'icon-btn danger'; del.textContent = 'Excluir';
-        del.addEventListener('click', () => { const i = state.bugs.findIndex(x => x.id === b.id); if (i>=0) state.bugs.splice(i,1); renderBugsList(); updateMetrics(); drawBurndown(); });
-        actions.appendChild(edit); actions.appendChild(del);
-        row.appendChild(title); row.appendChild(actions);
-        const meta = document.createElement('div'); meta.className = 'small'; meta.textContent = `${b.description || '(sem descrição)'} | Status: ${b.status}`;
-        li.appendChild(row); li.appendChild(meta);
+    
+    // Filtrar bugs da tarefa atual
+    const currentTaskId = Number(byId('editCardId').value);
+    const taskBugs = state.bugs.filter(b => b.taskId === currentTaskId);
+    
+    taskBugs.forEach(b => {
+        const li = document.createElement('li'); 
+        li.className = 'bug-item';
+        
+        const row = document.createElement('div'); 
+        row.className = 'row';
+        
+        const title = document.createElement('div'); 
+        title.textContent = `${b.title} [${b.priority}]`;
+        
+        const actions = document.createElement('div'); 
+        actions.className = 'row-actions';
+        
+        const edit = document.createElement('button'); 
+        edit.className = 'icon-btn'; 
+        edit.textContent = 'Editar';
+        edit.addEventListener('click', () => openEditBugModal(b));
+        
+        const del = document.createElement('button'); 
+        del.className = 'icon-btn danger'; 
+        del.textContent = 'Excluir';
+        del.addEventListener('click', () => { 
+            const i = state.bugs.findIndex(x => x.id === b.id); 
+            if (i>=0) state.bugs.splice(i,1); 
+            renderBugsList(); 
+            updateMetrics(); 
+        });
+        
+        actions.appendChild(edit); 
+        actions.appendChild(del);
+        row.appendChild(title); 
+        row.appendChild(actions);
+        
+        const meta = document.createElement('div'); 
+        meta.className = 'small'; 
+        meta.textContent = `${b.description || '(sem descrição)'} | Status: ${b.status}`;
+        
+        li.appendChild(row); 
+        li.appendChild(meta);
+        
+        // Mostrar evidências se existirem
+        if (b.evidence && b.evidence.length > 0) {
+            const evidenceDiv = document.createElement('div');
+            evidenceDiv.className = 'evidence-info';
+            evidenceDiv.innerHTML = `<strong>📎 Evidências:</strong> ${b.evidence.length} arquivo(s) anexado(s)`;
+            li.appendChild(evidenceDiv);
+        }
+        
         ul.appendChild(li);
     });
 }
 
-function editBug(b) {
-    const title = prompt('Editar título do bug', b.title);
-    if (title === null) return;
-    const description = prompt('Editar descrição', b.description || '');
-    if (description === null) return;
-    const priority = prompt('Editar prioridade (Alta/Média/Baixa)', b.priority);
-    if (priority === null) return;
-    const status = prompt('Editar status (Open/In Progress/Closed)', b.status);
-    if (status === null) return;
-    b.title = title.trim() || b.title;
-    b.description = description.trim();
-    b.priority = priority.trim() || b.priority;
-    b.status = status.trim() || b.status;
+
+
+// Evidências
+let currentBugId = null;
+let selectedBug = null;
+
+// Edição
+let editingTestCase = null;
+let editingBug = null;
+let editingComment = null;
+
+function bindEvidenceModal() {
+    byId('addEvidenceBtn').addEventListener('click', () => {
+        const currentTaskId = Number(byId('editCardId').value);
+        const currentTaskBugs = state.bugs.filter(b => b.taskId === currentTaskId);
+        if (currentTaskBugs.length === 0) {
+            alert('Adicione um bug primeiro antes de adicionar evidências!');
+            return;
+        }
+        openBugSelectionModal(currentTaskBugs);
+    });
+
+    // Bind do modal de seleção de bugs
+    byId('closeBugSelectionModal').addEventListener('click', closeBugSelectionModal);
+    byId('cancelBugSelection').addEventListener('click', closeBugSelectionModal);
+
+    byId('closeEvidenceModal').addEventListener('click', closeEvidenceModal);
+    byId('cancelEvidence').addEventListener('click', closeEvidenceModal);
+    
+    // Bind do formulário de evidências
+    byId('evidenceForm').addEventListener('submit', handleEvidenceSubmit);
+    
+    // Bind do input de arquivos para preview
+    byId('evidenceFiles').addEventListener('change', handleFileSelection);
+    
+    // Bind dos modais de edição
+    bindEditModals();
+    
+    // Bind do modal de sucesso de evidências
+    byId('closeEvidenceSuccessModal').addEventListener('click', closeEvidenceSuccessModal);
+    byId('closeEvidenceSuccess').addEventListener('click', closeEvidenceSuccessModal);
+}
+
+function openBugSelectionModal(bugs) {
+    const list = byId('bugSelectionList');
+    list.innerHTML = '';
+    
+    bugs.forEach(bug => {
+        const item = document.createElement('div');
+        item.className = 'bug-selection-item';
+        item.dataset.bugId = bug.id;
+        
+        item.innerHTML = `
+            <h5>${bug.title}</h5>
+            <p class="bug-meta">Prioridade: ${bug.priority} | Status: ${bug.status}</p>
+            ${bug.description ? `<p class="bug-description">${bug.description}</p>` : ''}
+        `;
+        
+        item.addEventListener('click', () => selectBug(bug));
+        list.appendChild(item);
+    });
+    
+    byId('bugSelectionModal').classList.add('show');
+    byId('bugSelectionModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeBugSelectionModal() {
+    byId('bugSelectionModal').classList.remove('show');
+    byId('bugSelectionModal').setAttribute('aria-hidden', 'true');
+    selectedBug = null;
+}
+
+function selectBug(bug) {
+    selectedBug = bug;
+    currentBugId = bug.id;
+    
+    // Atualizar informações do bug selecionado no modal de evidências
+    byId('selectedBugTitle').textContent = bug.title;
+    byId('selectedBugPriority').textContent = bug.priority;
+    byId('selectedBugStatus').textContent = bug.status;
+    
+    // Fechar modal de seleção e abrir modal de evidências
+    closeBugSelectionModal();
+    openEvidenceModal();
+}
+
+function openEvidenceModal() {
+    byId('evidenceModal').classList.add('show');
+    byId('evidenceModal').setAttribute('aria-hidden', 'false');
+    byId('evidenceFiles').value = '';
+    byId('evidencePreview').innerHTML = '';
+}
+
+function closeEvidenceModal() {
+    byId('evidenceModal').classList.remove('show');
+    byId('evidenceModal').setAttribute('aria-hidden', 'true');
+    currentBugId = null;
+    selectedBug = null;
+}
+
+// Funções para modais de edição
+function bindEditModals() {
+    // Modal de edição de caso de teste
+    byId('closeEditTestCaseModal').addEventListener('click', closeEditTestCaseModal);
+    byId('cancelEditTestCase').addEventListener('click', closeEditTestCaseModal);
+    byId('editTestCaseForm').addEventListener('submit', handleEditTestCaseSubmit);
+    
+    // Modal de edição de bug
+    byId('closeEditBugModal').addEventListener('click', closeEditBugModal);
+    byId('cancelEditBug').addEventListener('click', closeEditBugModal);
+    byId('editBugForm').addEventListener('submit', handleEditBugSubmit);
+    
+    // Modal de edição de comentário
+    byId('closeEditCommentModal').addEventListener('click', closeEditCommentModal);
+    byId('cancelEditComment').addEventListener('click', closeEditCommentModal);
+    byId('editCommentForm').addEventListener('submit', handleEditCommentSubmit);
+}
+
+function openEditTestCaseModal(testCase) {
+    editingTestCase = testCase;
+    byId('editTestCaseDescription').value = testCase.description;
+    byId('editTestCaseModal').classList.add('show');
+    byId('editTestCaseModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeEditTestCaseModal() {
+    byId('editTestCaseModal').classList.remove('show');
+    byId('editTestCaseModal').setAttribute('aria-hidden', 'true');
+    editingTestCase = null;
+}
+
+function openEditBugModal(bug) {
+    editingBug = bug;
+    byId('editBugTitle').value = bug.title;
+    byId('editBugDescription').value = bug.description || '';
+    byId('editBugPriority').value = bug.priority;
+    byId('editBugStatus').value = bug.status;
+    byId('editBugModal').classList.add('show');
+    byId('editBugModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeEditBugModal() {
+    byId('editBugModal').classList.remove('show');
+    byId('editBugModal').setAttribute('aria-hidden', 'true');
+    editingBug = null;
+}
+
+function handleEditTestCaseSubmit(e) {
+    e.preventDefault();
+    if (!editingTestCase) return;
+    
+    const newDescription = byId('editTestCaseDescription').value.trim();
+    if (!newDescription) return;
+    
+    editingTestCase.description = newDescription;
+    closeEditTestCaseModal();
+    renderTestCasesList();
+    updateMetrics();
+}
+
+function handleEditBugSubmit(e) {
+    e.preventDefault();
+    if (!editingBug) return;
+    
+    const newTitle = byId('editBugTitle').value.trim();
+    if (!newTitle) return;
+    
+    editingBug.title = newTitle;
+    editingBug.description = byId('editBugDescription').value.trim();
+    editingBug.priority = byId('editBugPriority').value;
+    editingBug.status = byId('editBugStatus').value;
+    
+    closeEditBugModal();
     renderBugsList();
     updateMetrics();
-    drawBurndown();
+}
+
+// Funções para edição de comentários
+function openEditCommentModal(comment, task) {
+    editingComment = comment;
+    byId('editCommentText').value = comment.text || '';
+    byId('editCommentModal').classList.add('show');
+    byId('editCommentModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeEditCommentModal() {
+    byId('editCommentModal').classList.remove('show');
+    byId('editCommentModal').setAttribute('aria-hidden', 'true');
+    editingComment = null;
+}
+
+function handleEditCommentSubmit(e) {
+    e.preventDefault();
+    if (!editingComment) return;
+    
+    const newText = byId('editCommentText').value.trim();
+    if (!newText) return;
+    
+    editingComment.text = newText;
+    closeEditCommentModal();
+    
+    // Re-renderizar comentários da tarefa atual
+    const currentTaskId = Number(byId('editCardId').value);
+    const currentTask = state.tasks.find(t => t.id === currentTaskId);
+    if (currentTask) {
+        renderComments(currentTask);
+    }
+}
+
+function handleFileSelection(e) {
+    const files = Array.from(e.target.files);
+    const preview = byId('evidencePreview');
+    preview.innerHTML = '';
+    
+    if (files.length > 5) {
+        alert('Máximo de 5 arquivos permitidos!');
+        e.target.value = '';
+        return;
+    }
+    
+    files.forEach((file, index) => {
+        const fileDiv = document.createElement('div');
+        fileDiv.className = 'file-preview';
+        
+        const fileName = document.createElement('div');
+        fileName.className = 'file-name';
+        fileName.textContent = file.name;
+        
+        const fileSize = document.createElement('div');
+        fileSize.className = 'file-size';
+        fileSize.textContent = formatFileSize(file.size);
+        
+        const fileType = document.createElement('div');
+        fileType.className = 'file-type';
+        fileType.textContent = file.type.split('/')[0]; // image ou video
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-file';
+        removeBtn.textContent = '❌';
+        removeBtn.onclick = () => removeFile(index, e.target);
+        
+        fileDiv.appendChild(fileName);
+        fileDiv.appendChild(fileSize);
+        fileDiv.appendChild(fileType);
+        fileDiv.appendChild(removeBtn);
+        preview.appendChild(fileDiv);
+    });
+}
+
+function removeFile(index, input) {
+    const dt = new DataTransfer();
+    const files = Array.from(input.files);
+    files.splice(index, 1);
+    files.forEach(file => dt.items.add(file));
+    input.files = dt.files;
+    handleFileSelection({ target: input });
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function handleEvidenceSubmit(e) {
+    e.preventDefault();
+    
+    if (!currentBugId) return;
+    
+    const files = Array.from(byId('evidenceFiles').files);
+    if (files.length === 0) {
+        alert('Selecione pelo menos um arquivo!');
+        return;
+    }
+    
+    const bug = state.bugs.find(b => b.id === currentBugId);
+    if (!bug) return;
+    
+    const evidence = {
+        id: nextId(),
+        files: files.map(f => ({ name: f.name, size: f.size, type: f.type })),
+        timestamp: new Date().toISOString()
+    };
+    
+    bug.evidence.push(evidence);
+    
+    closeEvidenceModal();
+    renderBugsList();
+    
+    // Mostrar modal de sucesso em vez do alert
+    showEvidenceSuccessModal(bug);
+}
+
+// Funções para o modal de sucesso de evidências
+function showEvidenceSuccessModal(bug) {
+    byId('successBugTitle').textContent = bug.title;
+    byId('successBugName').textContent = bug.title;
+    byId('successBugPriority').textContent = bug.priority;
+    byId('successBugStatus').textContent = bug.status;
+    
+    byId('evidenceSuccessModal').classList.add('show');
+    byId('evidenceSuccessModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeEvidenceSuccessModal() {
+    byId('evidenceSuccessModal').classList.remove('show');
+    byId('evidenceSuccessModal').setAttribute('aria-hidden', 'true');
 }
 
 // Métricas e Burndown
 function updateMetrics() {
-    const testsTotal = state.requirements.reduce((acc, r) => acc + r.testCases.length, 0);
-    const testsExecuted = state.requirements.reduce((acc, r) => acc + r.testCases.filter(tc => tc.executed).length, 0);
+    const testsTotal = state.testCases.length;
+    const testsExecuted = state.testCases.filter(tc => tc.executed).length;
     const pct = testsTotal ? (testsExecuted / testsTotal) * 100 : 0;
     byId('metricTests').textContent = fmtPct(pct);
 
@@ -432,13 +922,33 @@ function updateMetrics() {
     const bugsClosed = state.bugs.filter(b => b.status === 'Closed').length;
     byId('metricBugs').textContent = `${bugsOpen} / ${bugsClosed}`;
 
-    const tasksDone = state.tasks.filter(t => t.status === 'Done').length;
+    const tasksDone = state.tasks.filter(t => t.status === 'Pronto').length;
     const tasksTotal = state.tasks.length;
     byId('metricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
+    
+    // Atualizar também as estatísticas do card de boas-vindas
+    updateWelcomeStats();
 }
 
-function drawBurndown() {
-    const canvas = byId('burndownCanvas');
+function updateDashboardMetrics() {
+    const testsTotal = state.testCases.length;
+    const testsExecuted = state.testCases.filter(tc => tc.executed).length;
+    const pct = testsTotal ? (testsExecuted / testsTotal) * 100 : 0;
+    byId('dashboardMetricTests').textContent = fmtPct(pct);
+
+    const bugsOpen = state.bugs.filter(b => b.status !== 'Closed').length;
+    const bugsClosed = state.bugs.filter(b => b.status === 'Closed').length;
+    byId('dashboardMetricBugs').textContent = `${bugsOpen} / ${bugsClosed}`;
+
+    const tasksDone = state.tasks.filter(t => t.status === 'Pronto').length;
+    const tasksTotal = state.tasks.length;
+    byId('dashboardMetricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
+}
+
+
+
+function drawDashboardBurndown() {
+    const canvas = byId('dashboardBurndownCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -456,7 +966,7 @@ function drawBurndown() {
 
     // Dados básicos: totais vs done
     const total = state.tasks.length || 1;
-    const done = state.tasks.filter(t => t.status === 'Done').length;
+    const done = state.tasks.filter(t => t.status === 'Pronto').length;
     const pending = Math.max(0, total - done);
 
     // Barras simples: done (verde) e pending (amarelo)
