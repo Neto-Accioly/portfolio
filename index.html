@@ -18,6 +18,9 @@
             <button id="setSprint">Definir</button>
             <div id="sprintCountdown" class="countdown">-- dias restantes</div>
         </div>
+        <div class="header-actions">
+            <button id="dashboardBtn" class="dashboard-btn">📊 Dashboard</button>
+        </div>
     </header>
 
     <section class="toolbar">
@@ -58,7 +61,6 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="docsTab">Documentação</button>
                 <button class="tab-button" data-tab="bugsTab">Bugs</button>
-                <button class="tab-button" data-tab="dashboardTab">Dashboard</button>
             </div>
             <div class="tab-content">
                 <section id="docsTab" class="tab-pane active">
@@ -116,26 +118,7 @@
                     </div>
                 </section>
 
-                <section id="dashboardTab" class="tab-pane">
-                    <div class="metrics">
-                        <div class="metric">
-                            <div class="metric-title">Casos Executados</div>
-                            <div class="metric-value" id="metricTests">0%</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-title">Bugs (Abertos / Fechados)</div>
-                            <div class="metric-value" id="metricBugs">0 / 0</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-title">Tarefas (Done / Total)</div>
-                            <div class="metric-value" id="metricTasks">0 / 0</div>
-                        </div>
-                    </div>
-                    <div class="chart">
-                        <h3>Burn-down simples (Concluídas vs. Pendentes)</h3>
-                        <canvas id="burndownCanvas" width="360" height="200"></canvas>
-                    </div>
-                </section>
+
             </div>
         </aside>
     </main>
@@ -183,6 +166,36 @@
                         <input type="file" id="commentFiles" multiple />
                         <button type="submit">Adicionar</button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do Dashboard -->
+    <div id="dashboardModal" class="modal" aria-hidden="true">
+        <div class="modal-content dashboard-modal">
+            <div class="modal-header">
+                <h3>📊 Dashboard - Estatísticas do Projeto</h3>
+                <button class="close-modal" id="closeDashboardModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-title">Casos Executados</div>
+                        <div class="metric-value" id="dashboardMetricTests">0%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Bugs (Abertos / Fechados)</div>
+                        <div class="metric-value" id="dashboardMetricBugs">0 / 0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Tarefas (Done / Total)</div>
+                        <div class="metric-value" id="dashboardMetricTasks">0 / 0</div>
+                    </div>
+                </div>
+                <div class="chart">
+                    <h3>Burn-down simples (Concluídas vs. Pendentes)</h3>
+                    <canvas id="dashboardBurndownCanvas" width="360" height="200"></canvas>
                 </div>
             </div>
         </div>

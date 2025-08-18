@@ -29,7 +29,6 @@ function renderAll() {
     renderRequirementsList();
     renderBugsList();
     updateMetrics();
-    drawBurndown();
 }
 
 // Tabs painel lateral
@@ -57,7 +56,6 @@ function bindSprintControls() {
         if (Number.isNaN(d.getTime())) return;
         state.sprintEnd = d;
         updateCountdown(countdown);
-        drawBurndown();
     });
     setInterval(() => updateCountdown(countdown), 60 * 1000);
     updateCountdown(countdown);
@@ -84,7 +82,6 @@ function bindNewTaskForm() {
         form.reset();
         renderKanban();
         updateMetrics();
-        drawBurndown();
     });
 }
 
@@ -139,7 +136,6 @@ function bindKanbanDropzones() {
             task.status = targetStatus;
             renderKanban();
             updateMetrics();
-            drawBurndown();
         });
     });
 }
@@ -152,6 +148,8 @@ function onDragStartCard(e) {
 // Modal de edição de card + comentários
 function bindModal() {
     byId('closeCardModal').addEventListener('click', closeCardModal);
+    byId('closeDashboardModal').addEventListener('click', closeDashboardModal);
+    byId('dashboardBtn').addEventListener('click', openDashboardModal);
     byId('deleteCard').addEventListener('click', () => {
         const id = Number(byId('editCardId').value);
         const idx = state.tasks.findIndex(t => t.id === id);
@@ -159,7 +157,6 @@ function bindModal() {
         closeCardModal();
         renderKanban();
         updateMetrics();
-        drawBurndown();
     });
     byId('editCardForm').addEventListener('submit', (e) => {
         e.preventDefault();
@@ -180,7 +177,6 @@ function bindModal() {
         t.status = targetStatus;
         renderKanban();
         updateMetrics();
-        drawBurndown();
         closeCardModal();
     });
     byId('newCommentForm').addEventListener('submit', (e) => {
@@ -215,6 +211,18 @@ function openCardModal(id) {
 function closeCardModal() {
     byId('cardModal').classList.remove('show');
     byId('cardModal').setAttribute('aria-hidden', 'true');
+}
+
+function openDashboardModal() {
+    updateDashboardMetrics();
+    drawDashboardBurndown();
+    byId('dashboardModal').classList.add('show');
+    byId('dashboardModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeDashboardModal() {
+    byId('dashboardModal').classList.remove('show');
+    byId('dashboardModal').setAttribute('aria-hidden', 'true');
 }
 
 function renderComments(task) {
@@ -275,7 +283,6 @@ function bindRequirementForms() {
         tcForm.reset();
         renderRequirementDetail(req);
         updateMetrics();
-        drawBurndown();
     });
 }
 
@@ -324,7 +331,6 @@ function deleteRequirement(id) {
     if (selectedRequirementId === id) selectedRequirementId = null;
     renderRequirementsList();
     updateMetrics();
-    drawBurndown();
 }
 
 function renderRequirementDetail(req) {
@@ -346,7 +352,7 @@ function renderTestCases(req) {
         title.textContent = `${tc.title} ${tc.executed ? '(executado)' : ''}`;
         const actions = document.createElement('div'); actions.className = 'row-actions';
         const toggle = document.createElement('button'); toggle.className = 'icon-btn'; toggle.textContent = tc.executed ? 'Desmarcar' : 'Executado';
-        toggle.addEventListener('click', () => { tc.executed = !tc.executed; renderTestCases(req); updateMetrics(); drawBurndown(); });
+        toggle.addEventListener('click', () => { tc.executed = !tc.executed; renderTestCases(req); updateMetrics(); });
         const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
         edit.addEventListener('click', () => {
             const t = prompt('Editar título do caso', tc.title);
@@ -356,7 +362,7 @@ function renderTestCases(req) {
             tc.title = t.trim() || tc.title; tc.steps = s.trim(); renderTestCases(req);
         });
         const del = document.createElement('button'); del.className = 'icon-btn danger'; del.textContent = 'Excluir';
-        del.addEventListener('click', () => { const i = req.testCases.findIndex(x => x.id === tc.id); if (i>=0) req.testCases.splice(i,1); renderTestCases(req); updateMetrics(); drawBurndown(); });
+        del.addEventListener('click', () => { const i = req.testCases.findIndex(x => x.id === tc.id); if (i>=0) req.testCases.splice(i,1); renderTestCases(req); updateMetrics(); });
         actions.appendChild(toggle); actions.appendChild(edit); actions.appendChild(del);
         row.appendChild(title); row.appendChild(actions);
         const steps = document.createElement('div'); steps.className = 'small'; steps.textContent = tc.steps || '(sem passos)';
@@ -379,7 +385,6 @@ function bindBugForm() {
         form.reset();
         renderBugsList();
         updateMetrics();
-        drawBurndown();
     });
 }
 
@@ -394,7 +399,7 @@ function renderBugsList() {
         const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
         edit.addEventListener('click', () => editBug(b));
         const del = document.createElement('button'); del.className = 'icon-btn danger'; del.textContent = 'Excluir';
-        del.addEventListener('click', () => { const i = state.bugs.findIndex(x => x.id === b.id); if (i>=0) state.bugs.splice(i,1); renderBugsList(); updateMetrics(); drawBurndown(); });
+        del.addEventListener('click', () => { const i = state.bugs.findIndex(x => x.id === b.id); if (i>=0) state.bugs.splice(i,1); renderBugsList(); updateMetrics(); });
         actions.appendChild(edit); actions.appendChild(del);
         row.appendChild(title); row.appendChild(actions);
         const meta = document.createElement('div'); meta.className = 'small'; meta.textContent = `${b.description || '(sem descrição)'} | Status: ${b.status}`;
@@ -418,7 +423,6 @@ function editBug(b) {
     b.status = status.trim() || b.status;
     renderBugsList();
     updateMetrics();
-    drawBurndown();
 }
 
 // Métricas e Burndown
@@ -437,8 +441,25 @@ function updateMetrics() {
     byId('metricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
 }
 
-function drawBurndown() {
-    const canvas = byId('burndownCanvas');
+function updateDashboardMetrics() {
+    const testsTotal = state.requirements.reduce((acc, r) => acc + r.testCases.length, 0);
+    const testsExecuted = state.requirements.reduce((acc, r) => acc + r.testCases.filter(tc => tc.executed).length, 0);
+    const pct = testsTotal ? (testsExecuted / testsTotal) * 100 : 0;
+    byId('dashboardMetricTests').textContent = fmtPct(pct);
+
+    const bugsOpen = state.bugs.filter(b => b.status !== 'Closed').length;
+    const bugsClosed = state.bugs.filter(b => b.status === 'Closed').length;
+    byId('dashboardMetricBugs').textContent = `${bugsOpen} / ${bugsClosed}`;
+
+    const tasksDone = state.tasks.filter(t => t.status === 'Done').length;
+    const tasksTotal = state.tasks.length;
+    byId('dashboardMetricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
+}
+
+
+
+function drawDashboardBurndown() {
+    const canvas = byId('dashboardBurndownCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
