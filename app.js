@@ -92,11 +92,68 @@ function renderKanban() {
         const zone = document.querySelector(`.kanban-dropzone[data-status="${st}"]`);
         if (!zone) return;
         zone.innerHTML = '';
+        
+        // Se for a coluna Backlog e não houver tarefas, mostrar card de boas-vindas
+        if (st === 'Backlog' && state.tasks.filter(t => t.status === st).length === 0) {
+            const welcomeCard = createWelcomeCard();
+            zone.appendChild(welcomeCard);
+        }
+        
         state.tasks.filter(t => t.status === st).forEach(task => {
             const card = buildCard(task);
             zone.appendChild(card);
         });
     });
+    
+    // Atualizar estatísticas do card de boas-vindas
+    updateWelcomeStats();
+}
+
+// Função para criar o card de boas-vindas
+function createWelcomeCard() {
+    const welcomeDiv = document.createElement('div');
+    welcomeDiv.className = 'welcome-card';
+    welcomeDiv.innerHTML = `
+        <div class="welcome-header">
+            <div class="welcome-icon">🚀</div>
+            <h3>Bem-vindo ao Jiraiya!</h3>
+        </div>
+        <div class="quick-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="welcomeTotalTasks">0</div>
+                <div class="stat-label">Tarefas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="welcomeCompletedTasks">0</div>
+                <div class="stat-label">Concluídas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="welcomeTestCases">0</div>
+                <div class="stat-label">Casos de Teste</div>
+            </div>
+        </div>
+        <div class="welcome-tips">
+            <p>💡 <strong>Dica:</strong> Clique duas vezes em uma tarefa para editar</p>
+            <p>📊 Use o Dashboard para ver estatísticas do projeto</p>
+        </div>
+    `;
+    return welcomeDiv;
+}
+
+// Função para atualizar as estatísticas do card de boas-vindas
+function updateWelcomeStats() {
+    const totalTasks = state.tasks.length;
+    const completedTasks = state.tasks.filter(t => t.status === 'Pronto').length;
+    const totalTestCases = state.testCases.length;
+    
+    // Atualizar elementos se existirem
+    const totalTasksEl = document.getElementById('welcomeTotalTasks');
+    const completedTasksEl = document.getElementById('welcomeCompletedTasks');
+    const testCasesEl = document.getElementById('welcomeTestCases');
+    
+    if (totalTasksEl) totalTasksEl.textContent = totalTasks;
+    if (completedTasksEl) completedTasksEl.textContent = completedTasks;
+    if (testCasesEl) testCasesEl.textContent = totalTestCases;
 }
 
 function buildCard(task) {
@@ -211,10 +268,11 @@ function bindModal() {
             else if (e.target.id === 'bugSelectionModal') closeBugSelectionModal();
             else if (e.target.id === 'editTestCaseModal') closeEditTestCaseModal();
             else if (e.target.id === 'editBugModal') closeEditBugModal();
-            else if (e.target.id === 'editCommentModal') closeEditCommentModal();
-            else if (e.target.id === 'deleteConfirmModal') closeDeleteConfirmModal();
-        }
-    });
+                    else if (e.target.id === 'editCommentModal') closeEditCommentModal();
+        else if (e.target.id === 'deleteConfirmModal') closeDeleteConfirmModal();
+        else if (e.target.id === 'evidenceSuccessModal') closeEvidenceSuccessModal();
+    }
+});
     
     byId('deleteCard').addEventListener('click', () => {
         const id = Number(byId('editCardId').value);
@@ -579,6 +637,10 @@ function bindEvidenceModal() {
     
     // Bind dos modais de edição
     bindEditModals();
+    
+    // Bind do modal de sucesso de evidências
+    byId('closeEvidenceSuccessModal').addEventListener('click', closeEvidenceSuccessModal);
+    byId('closeEvidenceSuccess').addEventListener('click', closeEvidenceSuccessModal);
 }
 
 function openBugSelectionModal(bugs) {
@@ -828,7 +890,25 @@ function handleEvidenceSubmit(e) {
     
     closeEvidenceModal();
     renderBugsList();
-    alert(`Evidências adicionadas com sucesso ao bug "${bug.title}"!`);
+    
+    // Mostrar modal de sucesso em vez do alert
+    showEvidenceSuccessModal(bug);
+}
+
+// Funções para o modal de sucesso de evidências
+function showEvidenceSuccessModal(bug) {
+    byId('successBugTitle').textContent = bug.title;
+    byId('successBugName').textContent = bug.title;
+    byId('successBugPriority').textContent = bug.priority;
+    byId('successBugStatus').textContent = bug.status;
+    
+    byId('evidenceSuccessModal').classList.add('show');
+    byId('evidenceSuccessModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeEvidenceSuccessModal() {
+    byId('evidenceSuccessModal').classList.remove('show');
+    byId('evidenceSuccessModal').setAttribute('aria-hidden', 'true');
 }
 
 // Métricas e Burndown
@@ -845,6 +925,9 @@ function updateMetrics() {
     const tasksDone = state.tasks.filter(t => t.status === 'Pronto').length;
     const tasksTotal = state.tasks.length;
     byId('metricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
+    
+    // Atualizar também as estatísticas do card de boas-vindas
+    updateWelcomeStats();
 }
 
 function updateDashboardMetrics() {
