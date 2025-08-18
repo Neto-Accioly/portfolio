@@ -125,6 +125,14 @@
                             <option value="Pronto">Pronto</option>
                         </select>
                     </label>
+                    <label>
+                        <strong>Tipo da Tarefa</strong>
+                        <select id="editCardType" required>
+                            <option value="Feature">🚀 Feature</option>
+                            <option value="Bug">🐛 Bug</option>
+                            <option value="Melhoria">⚡ Melhoria</option>
+                        </select>
+                    </label>
                                      </form>
                  <div class="comments">
                     <h4>Comentários</h4>
@@ -379,11 +387,48 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="deleteConfirmModal" class="modal" aria-hidden="true">
+        <div class="modal-content delete-confirm-modal">
+            <div class="modal-header">
+                <h3>🗑️ Confirmar Exclusão</h3>
+                <button class="close-modal" id="closeDeleteConfirmModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-confirm-section">
+                    <div class="delete-warning">
+                        <span class="warning-icon">⚠️</span>
+                        <h4>Tem certeza que deseja excluir esta tarefa?</h4>
+                        <p class="delete-task-info">A tarefa "<span id="deleteTaskTitle" class="task-title"></span>" será removida permanentemente.</p>
+                        <p class="delete-note">Esta ação não pode ser desfeita.</p>
+                    </div>
+                    <div class="delete-confirm-actions">
+                        <button type="button" class="delete-confirm-btn danger" id="confirmDelete">🗑️ Sim, Excluir</button>
+                        <button type="button" class="delete-cancel-btn" id="cancelDelete">❌ Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <template id="cardTemplate">
         <div class="card" draggable="true">
-            <div class="card-title"></div>
+            <div class="card-header">
+                <div class="card-title"></div>
+                <div class="card-menu">
+                    <button class="menu-trigger" aria-label="Menu da tarefa">⋮</button>
+                    <div class="menu-dropdown">
+                        <button class="menu-item edit-task">✏️ Editar</button>
+                        <button class="menu-item delete-task danger">🗑️ Deletar</button>
+                    </div>
+                </div>
+            </div>
             <div class="card-meta">
-                <span class="priority"></span>
+                <div class="card-tags">
+                    <span class="card-type"></span>
+                    <span class="priority"></span>
+                </div>
+                <span class="card-status"></span>
             </div>
         </div>
     </template>

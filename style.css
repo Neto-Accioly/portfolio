@@ -125,8 +125,151 @@ body {
 
 .card { background: var(--panel-2); border: 1px solid #2d3766; border-radius: 10px; padding: 10px; cursor: grab; box-shadow: var(--shadow); }
 .card:active { cursor: grabbing; }
-.card-title { font-weight: 600; margin-bottom: 6px; }
-.card-meta { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 12px; }
+
+/* Estilos para Tags de Tarefas */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.card-title {
+    flex: 1;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* Removido .card-actions pois não é mais necessário */
+
+.card-menu {
+    position: relative;
+    margin-left: auto;
+}
+
+.menu-trigger {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.menu-trigger:hover {
+    background: rgba(108, 140, 255, 0.1);
+    color: var(--accent);
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--panel);
+    border: 1px solid #2d3766;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    min-width: 140px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
+
+.menu-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.menu-item {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    padding: 10px 12px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.menu-item:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.menu-item:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.menu-item:hover {
+    background: var(--panel-2);
+}
+
+.menu-item.danger {
+    color: var(--danger);
+}
+
+.menu-item.danger:hover {
+    background: rgba(255, 92, 112, 0.1);
+}
+
+.card-type {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.card-type.Feature {
+    background: rgba(61, 220, 151, 0.15) !important;
+    color: #3ddc97 !important;
+    border: 1px solid rgba(61, 220, 151, 0.3) !important;
+}
+
+.card-type.Bug {
+    background: rgba(255, 92, 112, 0.15) !important;
+    color: #ff5c70 !important;
+    border: 1px solid rgba(255, 92, 112, 0.3) !important;
+}
+
+.card-type.Melhoria {
+    background: rgba(255, 204, 102, 0.15) !important;
+    color: #ffcc66 !important;
+    border: 1px solid rgba(255, 204, 102, 0.3) !important;
+}
+
+.card-meta { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    color: var(--muted); 
+    font-size: 12px; 
+}
+
+.card-tags {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.card-status {
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--panel);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #2d3766;
+}
 .priority { padding: 2px 8px; border-radius: 999px; border: 1px solid #39447a; }
 .priority.Alta { background: rgba(255,92,112,.12); color: #ff98a6; border-color: rgba(255,92,112,.35); }
 .priority.Média { background: rgba(255,204,102,.12); color: #ffd78a; border-color: rgba(255,204,102,.35); }
@@ -850,6 +993,93 @@ body {
 }
 
 .edit-comment-cancel:hover {
+    background: var(--accent);
+    color: white;
+}
+
+/* Estilos para Modal de Confirmação de Exclusão */
+.delete-confirm-modal {
+    width: 500px;
+}
+
+.delete-confirm-section {
+    background: var(--panel-2);
+    border: 1px solid #2d3766;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.delete-warning {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.warning-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.delete-warning h4 {
+    margin: 0 0 16px 0;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.delete-task-info {
+    margin: 0 0 12px 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.task-title {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.delete-note {
+    margin: 0;
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.delete-confirm-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.delete-confirm-btn, .delete-cancel-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.delete-confirm-btn {
+    background: var(--danger);
+    color: white;
+}
+
+.delete-confirm-btn:hover {
+    background: #e64a5a;
+    transform: translateY(-1px);
+}
+
+.delete-cancel-btn {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid #2d3766;
+}
+
+.delete-cancel-btn:hover {
     background: var(--accent);
     color: white;
 }

@@ -79,7 +79,7 @@ function bindNewTaskForm() {
         const description = byId('taskDescription').value.trim();
         const priority = byId('taskPriority').value;
         if (!title) return;
-        state.tasks.push({ id: nextId(), title, description, priority, status: 'Backlog', comments: [] });
+        state.tasks.push({ id: nextId(), title, description, priority, status: 'Backlog', type: 'Feature', comments: [] });
         form.reset();
         renderKanban();
         updateMetrics();
@@ -103,10 +103,48 @@ function buildCard(task) {
     const tmpl = byId('cardTemplate');
     const node = tmpl.content.firstElementChild.cloneNode(true);
     node.dataset.id = task.id;
+    
+    // Configurar título e tipo da tarefa
     node.querySelector('.card-title').textContent = task.title;
+    node.querySelector('.card-type').textContent = task.type || 'Feature';
+    node.querySelector('.card-type').className = `card-type ${task.type || 'Feature'}`;
+    
+    // Configurar prioridade e status
     const pr = node.querySelector('.priority');
     pr.textContent = task.priority;
     pr.classList.add(task.priority);
+    
+    node.querySelector('.card-status').textContent = task.status;
+    
+    // Configurar menu de ações
+    const menuTrigger = node.querySelector('.menu-trigger');
+    const menuDropdown = node.querySelector('.menu-dropdown');
+    
+    // Toggle do menu
+    menuTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuDropdown.classList.toggle('show');
+    });
+    
+    // Botão editar
+    const editBtn = node.querySelector('.edit-task');
+    editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openCardModal(task.id);
+    });
+    
+    // Botão deletar
+    const deleteBtn = node.querySelector('.delete-task');
+    deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openDeleteConfirmModal(task);
+    });
+    
+    // Fechar menu ao clicar fora
+    document.addEventListener('click', () => {
+        menuDropdown.classList.remove('show');
+    });
+    
     node.addEventListener('dragstart', onDragStartCard);
     node.addEventListener('dblclick', () => openCardModal(task.id));
     return node;
@@ -152,6 +190,11 @@ function bindModal() {
     byId('closeDashboardModal').addEventListener('click', closeDashboardModal);
     byId('dashboardBtn').addEventListener('click', openDashboardModal);
     
+    // Bind do modal de confirmação de exclusão
+    byId('closeDeleteConfirmModal').addEventListener('click', closeDeleteConfirmModal);
+    byId('cancelDelete').addEventListener('click', closeDeleteConfirmModal);
+    byId('confirmDelete').addEventListener('click', handleConfirmDelete);
+    
     // Bind das abas do modal
     bindModalTabs();
     
@@ -169,6 +212,7 @@ function bindModal() {
             else if (e.target.id === 'editTestCaseModal') closeEditTestCaseModal();
             else if (e.target.id === 'editBugModal') closeEditBugModal();
             else if (e.target.id === 'editCommentModal') closeEditCommentModal();
+            else if (e.target.id === 'deleteConfirmModal') closeDeleteConfirmModal();
         }
     });
     
@@ -197,6 +241,7 @@ function bindModal() {
         t.description = byId('editCardDescription').value.trim();
         t.priority = byId('editCardPriority').value;
         t.status = targetStatus;
+        t.type = byId('editCardType').value;
         renderKanban();
         updateMetrics();
         closeCardModal();
@@ -225,6 +270,7 @@ function openCardModal(id) {
     byId('editCardDescription').value = t.description || '';
     byId('editCardPriority').value = t.priority;
     byId('editCardStatus').value = t.status;
+    byId('editCardType').value = t.type || 'Feature';
     renderComments(t);
     
     // Renderizar casos de teste e bugs da tarefa
@@ -238,6 +284,34 @@ function openCardModal(id) {
 function closeCardModal() {
     byId('cardModal').classList.remove('show');
     byId('cardModal').setAttribute('aria-hidden', 'true');
+}
+
+// Variável global para armazenar a tarefa a ser excluída
+let taskToDelete = null;
+
+function openDeleteConfirmModal(task) {
+    taskToDelete = task;
+    byId('deleteTaskTitle').textContent = task.title;
+    byId('deleteConfirmModal').classList.add('show');
+    byId('deleteConfirmModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeDeleteConfirmModal() {
+    byId('deleteConfirmModal').classList.remove('show');
+    byId('deleteConfirmModal').setAttribute('aria-hidden', 'true');
+    taskToDelete = null;
+}
+
+function handleConfirmDelete() {
+    if (taskToDelete) {
+        const idx = state.tasks.findIndex(t => t.id === taskToDelete.id);
+        if (idx >= 0) {
+            state.tasks.splice(idx, 1);
+            renderKanban();
+            updateMetrics();
+        }
+        closeDeleteConfirmModal();
+    }
 }
 
 
