@@ -33,7 +33,7 @@
                 <option value="Média" selected>Média</option>
                 <option value="Baixa">Baixa</option>
             </select>
-            <button type="submit">Adicionar</button>
+            <button type="submit">Adicionar à Fila</button>
         </form>
     </section>
 
@@ -43,17 +43,33 @@
                 <div class="kanban-header">Backlog</div>
                 <div class="kanban-dropzone" data-status="Backlog"></div>
             </div>
-            <div class="kanban-column" data-status="To Do">
-                <div class="kanban-header">To Do</div>
-                <div class="kanban-dropzone" data-status="To Do"></div>
+            <div class="kanban-column" data-status="Pendente Para Dev">
+                <div class="kanban-header">Pendente Para Dev</div>
+                <div class="kanban-dropzone" data-status="Pendente Para Dev"></div>
             </div>
-            <div class="kanban-column" data-status="In Progress">
-                <div class="kanban-header">In Progress <span class="wip">WIP ≤ 3</span></div>
-                <div class="kanban-dropzone" data-status="In Progress"></div>
+            <div class="kanban-column" data-status="Em Desenvolvimento">
+                <div class="kanban-header">Em Desenvolvimento <span class="wip">WIP ≤ 3</span></div>
+                <div class="kanban-dropzone" data-status="Em Desenvolvimento"></div>
             </div>
-            <div class="kanban-column" data-status="Done">
-                <div class="kanban-header">Done</div>
-                <div class="kanban-dropzone" data-status="Done"></div>
+            <div class="kanban-column" data-status="Code Review">
+                <div class="kanban-header">Code Review</div>
+                <div class="kanban-dropzone" data-status="Code Review"></div>
+            </div>
+            <div class="kanban-column" data-status="Pendente para QA">
+                <div class="kanban-header">Pendente para QA</div>
+                <div class="kanban-dropzone" data-status="Pendente para QA"></div>
+            </div>
+            <div class="kanban-column" data-status="Em Testes">
+                <div class="kanban-header">Em Testes</div>
+                <div class="kanban-dropzone" data-status="Em Testes"></div>
+            </div>
+            <div class="kanban-column" data-status="Pendente de Aprovação">
+                <div class="kanban-header">Pendente de Aprovação</div>
+                <div class="kanban-dropzone" data-status="Pendente de Aprovação"></div>
+            </div>
+            <div class="kanban-column" data-status="Pronto">
+                <div class="kanban-header">Pronto</div>
+                <div class="kanban-dropzone" data-status="Pronto"></div>
             </div>
         </section>
 
@@ -148,9 +164,13 @@
                     <label>Status
                         <select id="editCardStatus">
                             <option value="Backlog">Backlog</option>
-                            <option value="To Do">To Do</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Done">Done</option>
+                            <option value="Pendente Para Dev">Pendente Para Dev</option>
+                            <option value="Em Desenvolvimento">Em Desenvolvimento</option>
+                            <option value="Code Review">Code Review</option>
+                            <option value="Pendente para QA">Pendente para QA</option>
+                            <option value="Em Testes">Em Testes</option>
+                            <option value="Pendente de Aprovação">Pendente de Aprovação</option>
+                            <option value="Pronto">Pronto</option>
                         </select>
                     </label>
                     <div class="modal-actions">

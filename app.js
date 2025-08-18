@@ -78,7 +78,7 @@ function bindNewTaskForm() {
         const description = byId('taskDescription').value.trim();
         const priority = byId('taskPriority').value;
         if (!title) return;
-        state.tasks.push({ id: nextId(), title, description, priority, status: 'Backlog', comments: [] });
+        state.tasks.push({ id: nextId(), title, description, priority, status: 'Pendente Para Dev', comments: [] });
         form.reset();
         renderKanban();
         updateMetrics();
@@ -86,7 +86,7 @@ function bindNewTaskForm() {
 }
 
 function renderKanban() {
-    const statuses = ['Backlog', 'To Do', 'In Progress', 'Done'];
+    const statuses = ['Backlog', 'Pendente Para Dev', 'Em Desenvolvimento', 'Code Review', 'Pendente para QA', 'Em Testes', 'Pendente de Aprovação', 'Pronto'];
     statuses.forEach((st) => {
         const zone = document.querySelector(`.kanban-dropzone[data-status="${st}"]`);
         if (!zone) return;
@@ -126,10 +126,10 @@ function bindKanbanDropzones() {
             const task = state.tasks.find(t => t.id === id);
             if (!task) return;
             const targetStatus = z.dataset.status;
-            if (targetStatus === 'In Progress') {
-                const wip = state.tasks.filter(t => t.status === 'In Progress').length;
-                if (task.status !== 'In Progress' && wip >= 3) {
-                    alert('Limite de WIP atingido (3). Mova algo para Done antes.');
+            if (targetStatus === 'Em Desenvolvimento') {
+                const wip = state.tasks.filter(t => t.status === 'Em Desenvolvimento').length;
+                if (task.status !== 'Em Desenvolvimento' && wip >= 3) {
+                    alert('Limite de WIP atingido (3). Mova algo para Code Review antes.');
                     return;
                 }
             }
@@ -164,9 +164,9 @@ function bindModal() {
         const t = state.tasks.find(x => x.id === id);
         if (!t) return;
         const targetStatus = byId('editCardStatus').value;
-        if (targetStatus === 'In Progress') {
-            const wip = state.tasks.filter(x => x.status === 'In Progress').length;
-            if (t.status !== 'In Progress' && wip >= 3) {
+        if (targetStatus === 'Em Desenvolvimento') {
+            const wip = state.tasks.filter(x => x.status === 'Em Desenvolvimento').length;
+            if (t.status !== 'Em Desenvolvimento' && wip >= 3) {
                 alert('Limite de WIP atingido (3).');
                 return;
             }
@@ -436,7 +436,7 @@ function updateMetrics() {
     const bugsClosed = state.bugs.filter(b => b.status === 'Closed').length;
     byId('metricBugs').textContent = `${bugsOpen} / ${bugsClosed}`;
 
-    const tasksDone = state.tasks.filter(t => t.status === 'Done').length;
+    const tasksDone = state.tasks.filter(t => t.status === 'Pronto').length;
     const tasksTotal = state.tasks.length;
     byId('metricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
 }
@@ -451,7 +451,7 @@ function updateDashboardMetrics() {
     const bugsClosed = state.bugs.filter(b => b.status === 'Closed').length;
     byId('dashboardMetricBugs').textContent = `${bugsOpen} / ${bugsClosed}`;
 
-    const tasksDone = state.tasks.filter(t => t.status === 'Done').length;
+    const tasksDone = state.tasks.filter(t => t.status === 'Pronto').length;
     const tasksTotal = state.tasks.length;
     byId('dashboardMetricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
 }
@@ -477,7 +477,7 @@ function drawDashboardBurndown() {
 
     // Dados básicos: totais vs done
     const total = state.tasks.length || 1;
-    const done = state.tasks.filter(t => t.status === 'Done').length;
+    const done = state.tasks.filter(t => t.status === 'Pronto').length;
     const pending = Math.max(0, total - done);
 
     // Barras simples: done (verde) e pending (amarelo)
