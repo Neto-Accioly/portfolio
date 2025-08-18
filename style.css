@@ -33,7 +33,20 @@ body {
     z-index: 10;
 }
 .brand { display: flex; align-items: center; gap: 10px; }
-.brand .logo { font-size: 22px; }
+.brand .logo { 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.brand .logo svg {
+    transition: transform 0.3s ease;
+}
+.brand .logo:hover svg {
+    transform: scale(1.1) rotate(5deg);
+}
 .brand h1 { margin: 0; font-size: 20px; letter-spacing: .5px; }
 
 .sprint-controls { display: flex; align-items: center; gap: 10px; color: var(--muted); }
@@ -224,6 +237,9 @@ body {
 .dashboard-modal { width: 720px; }
 .evidence-modal { width: 600px; }
 .bug-selection-modal { width: 500px; }
+.edit-testcase-modal { width: 500px; }
+.edit-bug-modal { width: 550px; }
+.edit-comment-modal { width: 500px; }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #2a3363; position: sticky; top: 0; background: var(--panel); z-index: 10; }
 .modal-body { padding: 16px; display: grid; gap: 20px; }
 .close-modal { background: transparent; color: var(--muted); border: 1px solid #36407a; border-radius: 6px; padding: 4px 8px; cursor: pointer; }
@@ -659,6 +675,183 @@ body {
 .bug-meta span {
     color: var(--text);
     font-weight: 500;
+}
+
+/* Estilos para Modais de Edição */
+.edit-testcase-section, .edit-bug-section {
+    background: var(--panel-2);
+    border: 1px solid #2d3766;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.edit-testcase-section h4, .edit-bug-section h4 {
+    margin: 0 0 16px 0;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.edit-testcase-form, .edit-bug-form {
+    display: grid;
+    gap: 20px;
+}
+
+.edit-testcase-form label, .edit-bug-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.edit-testcase-form label strong, .edit-bug-form label strong {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.edit-testcase-form textarea, .edit-bug-form textarea,
+.edit-testcase-form input, .edit-bug-form input,
+.edit-testcase-form select, .edit-bug-form select {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid #2d3766;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.edit-testcase-form textarea, .edit-bug-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.edit-bug-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.edit-testcase-actions, .edit-bug-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.edit-testcase-save, .edit-bug-save {
+    background: var(--accent-2);
+    color: var(--bg);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.edit-testcase-save:hover, .edit-bug-save:hover {
+    background: #2bc87a;
+    transform: translateY(-1px);
+}
+
+.edit-testcase-cancel, .edit-bug-cancel {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid #2d3766;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.edit-testcase-cancel:hover, .edit-bug-cancel:hover {
+    background: var(--accent);
+    color: white;
+}
+
+/* Estilos para Modal de Edição de Comentário */
+.edit-comment-section {
+    background: var(--panel-2);
+    border: 1px solid #2d3766;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.edit-comment-section h4 {
+    margin: 0 0 16px 0;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.edit-comment-form {
+    display: grid;
+    gap: 20px;
+}
+
+.edit-comment-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.edit-comment-form label strong {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.edit-comment-form textarea {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid #2d3766;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.edit-comment-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.edit-comment-save {
+    background: var(--accent-2);
+    color: var(--bg);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.edit-comment-save:hover {
+    background: #2bc87a;
+    transform: translateY(-1px);
+}
+
+.edit-comment-cancel {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid #2d3766;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.edit-comment-cancel:hover {
+    background: var(--accent);
+    color: white;
 }
 
 

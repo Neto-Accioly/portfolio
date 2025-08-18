@@ -166,6 +166,9 @@ function bindModal() {
             else if (e.target.id === 'dashboardModal') closeDashboardModal();
             else if (e.target.id === 'evidenceModal') closeEvidenceModal();
             else if (e.target.id === 'bugSelectionModal') closeBugSelectionModal();
+            else if (e.target.id === 'editTestCaseModal') closeEditTestCaseModal();
+            else if (e.target.id === 'editBugModal') closeEditBugModal();
+            else if (e.target.id === 'editCommentModal') closeEditCommentModal();
         }
     });
     
@@ -293,6 +296,12 @@ function renderComments(task) {
         }
         const actions = document.createElement('div');
         actions.className = 'row-actions';
+        
+        const edit = document.createElement('button');
+        edit.className = 'icon-btn';
+        edit.textContent = 'Editar';
+        edit.addEventListener('click', () => openEditCommentModal(c, task));
+        
         const del = document.createElement('button');
         del.className = 'icon-btn danger';
         del.textContent = 'Excluir';
@@ -300,6 +309,8 @@ function renderComments(task) {
             const i = task.comments.indexOf(c);
             if (i >= 0) { task.comments.splice(i, 1); renderComments(task); }
         });
+        
+        actions.appendChild(edit);
         actions.appendChild(del);
         li.appendChild(actions);
         ul.appendChild(li);
@@ -351,7 +362,7 @@ function renderTestCasesList() {
         const edit = document.createElement('button'); 
         edit.className = 'icon-btn'; 
         edit.textContent = 'Editar';
-        edit.addEventListener('click', () => editTestCase(tc));
+        edit.addEventListener('click', () => openEditTestCaseModal(tc));
         const del = document.createElement('button'); 
         del.className = 'icon-btn danger'; 
         del.textContent = 'Excluir';
@@ -376,12 +387,7 @@ function renderTestCasesList() {
     });
 }
 
-function editTestCase(tc) {
-    const description = prompt('Editar descrição do caso de teste', tc.description);
-    if (description === null) return;
-    tc.description = description.trim();
-    renderTestCasesList();
-}
+
 
 // Bugs
 function bindBugForm() {
@@ -426,7 +432,7 @@ function renderBugsList() {
         const edit = document.createElement('button'); 
         edit.className = 'icon-btn'; 
         edit.textContent = 'Editar';
-        edit.addEventListener('click', () => editBug(b));
+        edit.addEventListener('click', () => openEditBugModal(b));
         
         const del = document.createElement('button'); 
         del.className = 'icon-btn danger'; 
@@ -462,26 +468,16 @@ function renderBugsList() {
     });
 }
 
-function editBug(b) {
-    const title = prompt('Editar título do bug', b.title);
-    if (title === null) return;
-    const description = prompt('Editar descrição', b.description || '');
-    if (description === null) return;
-    const priority = prompt('Editar prioridade (Alta/Média/Baixa)', b.priority);
-    if (priority === null) return;
-    const status = prompt('Editar status (Open/In Progress/Closed)', b.status);
-    if (status === null) return;
-    b.title = title.trim() || b.title;
-    b.description = description.trim();
-    b.priority = priority.trim() || b.priority;
-    b.status = status.trim() || b.status;
-    renderBugsList();
-    updateMetrics();
-}
+
 
 // Evidências
 let currentBugId = null;
 let selectedBug = null;
+
+// Edição
+let editingTestCase = null;
+let editingBug = null;
+let editingComment = null;
 
 function bindEvidenceModal() {
     byId('addEvidenceBtn').addEventListener('click', () => {
@@ -506,6 +502,9 @@ function bindEvidenceModal() {
     
     // Bind do input de arquivos para preview
     byId('evidenceFiles').addEventListener('change', handleFileSelection);
+    
+    // Bind dos modais de edição
+    bindEditModals();
 }
 
 function openBugSelectionModal(bugs) {
@@ -563,6 +562,115 @@ function closeEvidenceModal() {
     byId('evidenceModal').setAttribute('aria-hidden', 'true');
     currentBugId = null;
     selectedBug = null;
+}
+
+// Funções para modais de edição
+function bindEditModals() {
+    // Modal de edição de caso de teste
+    byId('closeEditTestCaseModal').addEventListener('click', closeEditTestCaseModal);
+    byId('cancelEditTestCase').addEventListener('click', closeEditTestCaseModal);
+    byId('editTestCaseForm').addEventListener('submit', handleEditTestCaseSubmit);
+    
+    // Modal de edição de bug
+    byId('closeEditBugModal').addEventListener('click', closeEditBugModal);
+    byId('cancelEditBug').addEventListener('click', closeEditBugModal);
+    byId('editBugForm').addEventListener('submit', handleEditBugSubmit);
+    
+    // Modal de edição de comentário
+    byId('closeEditCommentModal').addEventListener('click', closeEditCommentModal);
+    byId('cancelEditComment').addEventListener('click', closeEditCommentModal);
+    byId('editCommentForm').addEventListener('submit', handleEditCommentSubmit);
+}
+
+function openEditTestCaseModal(testCase) {
+    editingTestCase = testCase;
+    byId('editTestCaseDescription').value = testCase.description;
+    byId('editTestCaseModal').classList.add('show');
+    byId('editTestCaseModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeEditTestCaseModal() {
+    byId('editTestCaseModal').classList.remove('show');
+    byId('editTestCaseModal').setAttribute('aria-hidden', 'true');
+    editingTestCase = null;
+}
+
+function openEditBugModal(bug) {
+    editingBug = bug;
+    byId('editBugTitle').value = bug.title;
+    byId('editBugDescription').value = bug.description || '';
+    byId('editBugPriority').value = bug.priority;
+    byId('editBugStatus').value = bug.status;
+    byId('editBugModal').classList.add('show');
+    byId('editBugModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeEditBugModal() {
+    byId('editBugModal').classList.remove('show');
+    byId('editBugModal').setAttribute('aria-hidden', 'true');
+    editingBug = null;
+}
+
+function handleEditTestCaseSubmit(e) {
+    e.preventDefault();
+    if (!editingTestCase) return;
+    
+    const newDescription = byId('editTestCaseDescription').value.trim();
+    if (!newDescription) return;
+    
+    editingTestCase.description = newDescription;
+    closeEditTestCaseModal();
+    renderTestCasesList();
+    updateMetrics();
+}
+
+function handleEditBugSubmit(e) {
+    e.preventDefault();
+    if (!editingBug) return;
+    
+    const newTitle = byId('editBugTitle').value.trim();
+    if (!newTitle) return;
+    
+    editingBug.title = newTitle;
+    editingBug.description = byId('editBugDescription').value.trim();
+    editingBug.priority = byId('editBugPriority').value;
+    editingBug.status = byId('editBugStatus').value;
+    
+    closeEditBugModal();
+    renderBugsList();
+    updateMetrics();
+}
+
+// Funções para edição de comentários
+function openEditCommentModal(comment, task) {
+    editingComment = comment;
+    byId('editCommentText').value = comment.text || '';
+    byId('editCommentModal').classList.add('show');
+    byId('editCommentModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeEditCommentModal() {
+    byId('editCommentModal').classList.remove('show');
+    byId('editCommentModal').setAttribute('aria-hidden', 'true');
+    editingComment = null;
+}
+
+function handleEditCommentSubmit(e) {
+    e.preventDefault();
+    if (!editingComment) return;
+    
+    const newText = byId('editCommentText').value.trim();
+    if (!newText) return;
+    
+    editingComment.text = newText;
+    closeEditCommentModal();
+    
+    // Re-renderizar comentários da tarefa atual
+    const currentTaskId = Number(byId('editCardId').value);
+    const currentTask = state.tasks.find(t => t.id === currentTaskId);
+    if (currentTask) {
+        renderComments(currentTask);
+    }
 }
 
 function handleFileSelection(e) {
