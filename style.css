@@ -232,6 +232,46 @@ body {
     font-size: 14px;
 }
 
+/* Botões de ação na parte de baixo do modal */
+.modal-actions-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.modal-actions-bottom button {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.modal-actions-bottom button[type="submit"] {
+    background: var(--accent);
+    color: white;
+}
+
+.modal-actions-bottom button[type="submit"]:hover {
+    background: #5a7aff;
+    transform: translateY(-1px);
+}
+
+.modal-actions-bottom button.danger {
+    background: var(--danger);
+    color: white;
+}
+
+.modal-actions-bottom button.danger:hover {
+    background: #e64a5a;
+    transform: translateY(-1px);
+}
+
 @media (max-width: 1400px) {
     .kanban { grid-template-columns: repeat(4, 1fr); }
 }

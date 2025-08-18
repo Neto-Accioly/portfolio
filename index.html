@@ -86,7 +86,7 @@
                     <label>Título
                         <input type="text" id="editCardTitle" required />
                     </label>
-                    <label>Descrição
+                    <label>Descrição da Tarefa (Requisitos)
                         <textarea id="editCardDescription" rows="3"></textarea>
                     </label>
                     <label>Prioridade
@@ -108,12 +108,8 @@
                             <option value="Pronto">Pronto</option>
                         </select>
                     </label>
-                    <div class="modal-actions">
-                        <button type="submit">Salvar</button>
-                        <button type="button" id="deleteCard" class="danger">Excluir</button>
-                    </div>
-                </form>
-                <div class="comments">
+                                     </form>
+                 <div class="comments">
                     <h4>Comentários</h4>
                     <ul id="commentsList"></ul>
                     <form id="newCommentForm" class="inline-form" autocomplete="off">
@@ -173,12 +169,18 @@
                                 <button type="submit">Adicionar Bug</button>
                             </form>
                             <ul id="bugsList" class="bugs-list"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                                                 </div>
+                     </div>
+                 </div>
+                 
+                 <!-- Botões de Ação na parte de baixo -->
+                 <div class="modal-actions-bottom">
+                     <button type="submit" form="editCardForm">Salvar</button>
+                     <button type="button" id="deleteCard" class="danger">Excluir</button>
+                 </div>
+             </div>
+         </div>
+     </div>
 
     <!-- Modal do Dashboard -->
     <div id="dashboardModal" class="modal" aria-hidden="true">
