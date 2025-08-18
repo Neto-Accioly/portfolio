@@ -128,24 +128,13 @@
                     
                     <!-- Aba de Documentação -->
                     <div id="documentationTab" class="tab-content active">
-                        <div class="requirements-section">
-                            <h4>Requisitos</h4>
-                            <form id="newRequirementForm" class="inline-form" autocomplete="off">
-                                <input type="text" id="reqTitle" placeholder="Título do Requisito" required />
-                                <input type="text" id="reqDescription" placeholder="Descrição" />
-                                <button type="submit">Adicionar Requisito</button>
+                        <div class="testcases-section">
+                            <h4>Casos de Teste</h4>
+                            <form id="newTestCaseForm" class="inline-form" autocomplete="off">
+                                <textarea id="tcDescription" placeholder="Descreva o caso de teste aqui..." rows="4" style="width: 100%; resize: vertical;"></textarea>
+                                <button type="submit">Adicionar Caso de Teste</button>
                             </form>
-                            <ul id="requirementsList" class="requirements-list"></ul>
-                            
-                            <div class="testcases-section">
-                                <h5>Casos de Teste</h5>
-                                <form id="newTestCaseForm" class="inline-form" autocomplete="off">
-                                    <input type="text" id="tcTitle" placeholder="Título do Caso de Teste" required />
-                                    <input type="text" id="tcSteps" placeholder="Passos" />
-                                    <button type="submit">Adicionar Caso de Teste</button>
-                                </form>
-                                <ul id="testCasesList" class="testcases-list"></ul>
-                            </div>
+                            <ul id="testCasesList" class="testcases-list"></ul>
                         </div>
                     </div>
                     
@@ -167,6 +156,7 @@
                                     <option value="Closed">Closed</option>
                                 </select>
                                 <button type="submit">Adicionar Bug</button>
+                                <button type="button" id="addEvidenceBtn" class="evidence-btn">📎 Adicionar Evidências</button>
                             </form>
                             <ul id="bugsList" class="bugs-list"></ul>
                                                  </div>
@@ -207,6 +197,37 @@
                 <div class="chart">
                     <h3>Burn-down simples (Concluídas vs. Pendentes)</h3>
                     <canvas id="dashboardBurndownCanvas" width="360" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Evidências -->
+    <div id="evidenceModal" class="modal" aria-hidden="true">
+        <div class="modal-content evidence-modal">
+            <div class="modal-header">
+                <h3>📎 Adicionar Evidências</h3>
+                <button class="close-modal" id="closeEvidenceModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="evidence-section">
+                    <h4>Selecionar Arquivos</h4>
+                    <p class="evidence-info">Formatos aceitos: Imagens (JPG, PNG, GIF) e Vídeos (MP4, AVI, MOV)</p>
+                    <form id="evidenceForm" class="evidence-form" autocomplete="off">
+                        <div class="file-upload-area">
+                            <input type="file" id="evidenceFiles" multiple accept="image/*,video/*" />
+                            <div class="upload-placeholder">
+                                <span class="upload-icon">📁</span>
+                                <p>Clique para selecionar arquivos ou arraste e solte aqui</p>
+                                <p class="upload-hint">Máximo 5 arquivos por evidência</p>
+                            </div>
+                        </div>
+                        <div class="evidence-preview" id="evidencePreview"></div>
+                        <div class="evidence-actions">
+                            <button type="submit" class="evidence-submit">✅ Salvar Evidências</button>
+                            <button type="button" class="evidence-cancel" id="cancelEvidence">❌ Cancelar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -1,8 +1,8 @@
 // Estado em memória
 const state = {
     tasks: [], // {id, title, description, priority, status, comments: [{text, files: [name]}]}
-    requirements: [], // {id, title, description, testCases: [{id, title, steps, executed:boolean}]}
-    bugs: [], // {id, title, description, priority, status}
+    testCases: [], // {id, description, executed: boolean, taskId: number}
+    bugs: [], // {id, title, description, priority, status, evidence: [{id, files: [name], type: string}]}
     sprintEnd: null,
     seq: 1,
 };
@@ -18,15 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
     bindSprintControls();
     bindNewTaskForm();
     bindKanbanDropzones();
-    bindRequirementForms();
+    bindTestCaseForm();
     bindBugForm();
+    bindEvidenceModal();
     bindModal();
     renderAll();
 });
 
 function renderAll() {
     renderKanban();
-    renderRequirementsList();
+    renderTestCasesList();
     renderBugsList();
     updateMetrics();
 }
@@ -155,7 +156,7 @@ function bindModal() {
     bindModalTabs();
     
     // Bind dos formulários de documentação e bugs
-    bindRequirementForms();
+    bindTestCaseForm();
     bindBugForm();
     byId('deleteCard').addEventListener('click', () => {
         const id = Number(byId('editCardId').value);
@@ -212,8 +213,8 @@ function openCardModal(id) {
     byId('editCardStatus').value = t.status;
     renderComments(t);
     
-    // Renderizar documentação e bugs da tarefa
-    renderRequirementsList();
+    // Renderizar casos de teste e bugs da tarefa
+    renderTestCasesList();
     renderBugsList();
     
     byId('cardModal').classList.add('show');
@@ -294,141 +295,81 @@ function renderComments(task) {
     });
 }
 
-// Requisitos e Casos de Teste
-let selectedRequirementId = null;
-
-function bindRequirementForms() {
-    const form = byId('newRequirementForm');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const title = byId('reqTitle').value.trim();
-        const description = byId('reqDescription').value.trim();
-        if (!title) return;
-        
-        const currentTaskId = Number(byId('editCardId').value);
-        const req = { id: nextId(), title, description, testCases: [], taskId: currentTaskId };
-        state.requirements.push(req);
-        form.reset();
-        renderRequirementsList();
-        updateMetrics();
-    });
-    
+// Casos de Teste
+function bindTestCaseForm() {
     const tcForm = byId('newTestCaseForm');
     tcForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const title = byId('tcTitle').value.trim();
-        const steps = byId('tcSteps').value.trim();
-        if (!title) return;
+        const description = byId('tcDescription').value.trim();
+        if (!description) return;
         
-        // Adicionar caso de teste ao primeiro requisito da tarefa atual
         const currentTaskId = Number(byId('editCardId').value);
-        const req = state.requirements.find(r => r.taskId === currentTaskId);
-        if (!req) {
-            alert('Adicione um requisito primeiro!');
-            return;
-        }
-        
-        req.testCases.push({ id: nextId(), title, steps, executed: false });
+        const testCase = { id: nextId(), description, executed: false, taskId: currentTaskId };
+        state.testCases.push(testCase);
         tcForm.reset();
-        renderRequirementsList();
+        renderTestCasesList();
         updateMetrics();
     });
 }
 
-function renderRequirementsList() {
-    const ul = byId('requirementsList');
-    ul.innerHTML = '';
-    
-    // Filtrar requisitos da tarefa atual
-    const currentTaskId = Number(byId('editCardId').value);
-    const taskRequirements = state.requirements.filter(r => r.taskId === currentTaskId);
-    
-    taskRequirements.forEach((r) => {
-        const li = document.createElement('li');
-        const row = document.createElement('div');
-        row.className = 'row';
-        const title = document.createElement('div');
-        title.textContent = r.title;
-        const actions = document.createElement('div');
-        actions.className = 'row-actions';
-        const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
-        edit.addEventListener('click', () => editRequirement(r));
-        const del = document.createElement('button'); del.className = 'icon-btn danger'; del.textContent = 'Excluir';
-        del.addEventListener('click', () => { deleteRequirement(r.id); });
-        actions.appendChild(edit); actions.appendChild(del);
-        row.appendChild(title); row.appendChild(actions);
-        const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = r.description || '(sem descrição)';
-        li.appendChild(row); li.appendChild(desc);
-        
-        // Mostrar casos de teste se existirem
-        if (r.testCases && r.testCases.length > 0) {
-            const testCasesDiv = document.createElement('div');
-            testCasesDiv.className = 'small';
-            testCasesDiv.style.marginTop = '8px';
-            testCasesDiv.style.paddingTop = '8px';
-            testCasesDiv.style.borderTop = '1px solid var(--border)';
-            testCasesDiv.innerHTML = `<strong>Casos de Teste:</strong> ${r.testCases.length} (${r.testCases.filter(tc => tc.executed).length} executados)`;
-            li.appendChild(testCasesDiv);
-        }
-        
-        ul.appendChild(li);
-    });
-}
-
-function editRequirement(req) {
-    const title = prompt('Editar título do requisito', req.title);
-    if (title === null) return;
-    const description = prompt('Editar descrição', req.description || '');
-    if (description === null) return;
-    req.title = title.trim() || req.title;
-    req.description = description.trim();
-    renderRequirementsList();
-}
-
-function deleteRequirement(id) {
-    const idx = state.requirements.findIndex(r => r.id === id);
-    if (idx >= 0) state.requirements.splice(idx, 1);
-    if (selectedRequirementId === id) selectedRequirementId = null;
-    renderRequirementsList();
-    updateMetrics();
-}
-
-function renderRequirementDetail(req) {
-    const host = byId('requirementDetail');
-    host.innerHTML = '';
-    const title = document.createElement('h4'); title.textContent = req.title;
-    const desc = document.createElement('p'); desc.textContent = req.description || '(sem descrição)';
-    host.appendChild(title); host.appendChild(desc);
-    renderTestCases(req);
-}
-
-function renderTestCases(req) {
+function renderTestCasesList() {
     const ul = byId('testCasesList');
     ul.innerHTML = '';
-    req.testCases.forEach(tc => {
-        const li = document.createElement('li'); li.className = 'testcase';
-        const row = document.createElement('div'); row.className = 'row';
-        const title = document.createElement('div');
-        title.textContent = `${tc.title} ${tc.executed ? '(executado)' : ''}`;
-        const actions = document.createElement('div'); actions.className = 'row-actions';
-        const toggle = document.createElement('button'); toggle.className = 'icon-btn'; toggle.textContent = tc.executed ? 'Desmarcar' : 'Executado';
-        toggle.addEventListener('click', () => { tc.executed = !tc.executed; renderTestCases(req); updateMetrics(); });
-        const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
-        edit.addEventListener('click', () => {
-            const t = prompt('Editar título do caso', tc.title);
-            if (t === null) return;
-            const s = prompt('Editar passos', tc.steps || '');
-            if (s === null) return;
-            tc.title = t.trim() || tc.title; tc.steps = s.trim(); renderTestCases(req);
+    
+    // Filtrar casos de teste da tarefa atual
+    const currentTaskId = Number(byId('editCardId').value);
+    const taskTestCases = state.testCases.filter(tc => tc.taskId === currentTaskId);
+    
+    taskTestCases.forEach((tc) => {
+        const li = document.createElement('li');
+        li.className = 'testcase';
+        const row = document.createElement('div');
+        row.className = 'row';
+        const description = document.createElement('div');
+        description.textContent = tc.description;
+        const actions = document.createElement('div');
+        actions.className = 'row-actions';
+        const toggle = document.createElement('button'); 
+        toggle.className = 'icon-btn'; 
+        toggle.textContent = tc.executed ? 'Desmarcar' : 'Executado';
+        toggle.addEventListener('click', () => { 
+            tc.executed = !tc.executed; 
+            renderTestCasesList(); 
+            updateMetrics(); 
         });
-        const del = document.createElement('button'); del.className = 'icon-btn danger'; del.textContent = 'Excluir';
-        del.addEventListener('click', () => { const i = req.testCases.findIndex(x => x.id === tc.id); if (i>=0) req.testCases.splice(i,1); renderTestCases(req); updateMetrics(); });
+        const edit = document.createElement('button'); 
+        edit.className = 'icon-btn'; 
+        edit.textContent = 'Editar';
+        edit.addEventListener('click', () => editTestCase(tc));
+        const del = document.createElement('button'); 
+        del.className = 'icon-btn danger'; 
+        del.textContent = 'Excluir';
+        del.addEventListener('click', () => { 
+            const i = state.testCases.findIndex(x => x.id === tc.id); 
+            if (i >= 0) state.testCases.splice(i, 1); 
+            renderTestCasesList(); 
+            updateMetrics(); 
+        });
         actions.appendChild(toggle); actions.appendChild(edit); actions.appendChild(del);
-        row.appendChild(title); row.appendChild(actions);
-        const steps = document.createElement('div'); steps.className = 'small'; steps.textContent = tc.steps || '(sem passos)';
-        li.appendChild(row); li.appendChild(steps);
+        row.appendChild(description); row.appendChild(actions);
+        li.appendChild(row);
+        
+        // Mostrar status de execução
+        const status = document.createElement('div'); 
+        status.className = 'small'; 
+        status.textContent = tc.executed ? '✅ Executado' : '⏳ Pendente';
+        status.style.marginTop = '8px';
+        li.appendChild(status);
+        
         ul.appendChild(li);
     });
+}
+
+function editTestCase(tc) {
+    const description = prompt('Editar descrição do caso de teste', tc.description);
+    if (description === null) return;
+    tc.description = description.trim();
+    renderTestCasesList();
 }
 
 // Bugs
@@ -443,7 +384,7 @@ function bindBugForm() {
         if (!title) return;
         
         const currentTaskId = Number(byId('editCardId').value);
-        state.bugs.push({ id: nextId(), title, description, priority, status, taskId: currentTaskId });
+        state.bugs.push({ id: nextId(), title, description, priority, status, taskId: currentTaskId, evidence: [] });
         form.reset();
         renderBugsList();
         updateMetrics();
@@ -459,18 +400,53 @@ function renderBugsList() {
     const taskBugs = state.bugs.filter(b => b.taskId === currentTaskId);
     
     taskBugs.forEach(b => {
-        const li = document.createElement('li'); li.className = 'bug-item';
-        const row = document.createElement('div'); row.className = 'row';
-        const title = document.createElement('div'); title.textContent = `${b.title} [${b.priority}]`;
-        const actions = document.createElement('div'); actions.className = 'row-actions';
-        const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
+        const li = document.createElement('li'); 
+        li.className = 'bug-item';
+        
+        const row = document.createElement('div'); 
+        row.className = 'row';
+        
+        const title = document.createElement('div'); 
+        title.textContent = `${b.title} [${b.priority}]`;
+        
+        const actions = document.createElement('div'); 
+        actions.className = 'row-actions';
+        
+        const edit = document.createElement('button'); 
+        edit.className = 'icon-btn'; 
+        edit.textContent = 'Editar';
         edit.addEventListener('click', () => editBug(b));
-        const del = document.createElement('button'); del.className = 'icon-btn danger'; del.textContent = 'Excluir';
-        del.addEventListener('click', () => { const i = state.bugs.findIndex(x => x.id === b.id); if (i>=0) state.bugs.splice(i,1); renderBugsList(); updateMetrics(); });
-        actions.appendChild(edit); actions.appendChild(del);
-        row.appendChild(title); row.appendChild(actions);
-        const meta = document.createElement('div'); meta.className = 'small'; meta.textContent = `${b.description || '(sem descrição)'} | Status: ${b.status}`;
-        li.appendChild(row); li.appendChild(meta);
+        
+        const del = document.createElement('button'); 
+        del.className = 'icon-btn danger'; 
+        del.textContent = 'Excluir';
+        del.addEventListener('click', () => { 
+            const i = state.bugs.findIndex(x => x.id === b.id); 
+            if (i>=0) state.bugs.splice(i,1); 
+            renderBugsList(); 
+            updateMetrics(); 
+        });
+        
+        actions.appendChild(edit); 
+        actions.appendChild(del);
+        row.appendChild(title); 
+        row.appendChild(actions);
+        
+        const meta = document.createElement('div'); 
+        meta.className = 'small'; 
+        meta.textContent = `${b.description || '(sem descrição)'} | Status: ${b.status}`;
+        
+        li.appendChild(row); 
+        li.appendChild(meta);
+        
+        // Mostrar evidências se existirem
+        if (b.evidence && b.evidence.length > 0) {
+            const evidenceDiv = document.createElement('div');
+            evidenceDiv.className = 'evidence-info';
+            evidenceDiv.innerHTML = `<strong>📎 Evidências:</strong> ${b.evidence.length} arquivo(s) anexado(s)`;
+            li.appendChild(evidenceDiv);
+        }
+        
         ul.appendChild(li);
     });
 }
@@ -492,10 +468,133 @@ function editBug(b) {
     updateMetrics();
 }
 
+// Evidências
+let currentBugId = null;
+
+function bindEvidenceModal() {
+    byId('addEvidenceBtn').addEventListener('click', () => {
+        // Encontrar o bug mais recente da tarefa atual
+        const currentTaskId = Number(byId('editCardId').value);
+        const currentTaskBugs = state.bugs.filter(b => b.taskId === currentTaskId);
+        if (currentTaskBugs.length === 0) {
+            alert('Adicione um bug primeiro antes de adicionar evidências!');
+            return;
+        }
+        currentBugId = currentTaskBugs[currentTaskBugs.length - 1].id;
+        openEvidenceModal();
+    });
+
+    byId('closeEvidenceModal').addEventListener('click', closeEvidenceModal);
+    byId('cancelEvidence').addEventListener('click', closeEvidenceModal);
+    
+    // Bind do formulário de evidências
+    byId('evidenceForm').addEventListener('submit', handleEvidenceSubmit);
+    
+    // Bind do input de arquivos para preview
+    byId('evidenceFiles').addEventListener('change', handleFileSelection);
+}
+
+function openEvidenceModal() {
+    byId('evidenceModal').classList.add('show');
+    byId('evidenceModal').setAttribute('aria-hidden', 'false');
+    byId('evidenceFiles').value = '';
+    byId('evidencePreview').innerHTML = '';
+}
+
+function closeEvidenceModal() {
+    byId('evidenceModal').classList.remove('show');
+    byId('evidenceModal').setAttribute('aria-hidden', 'true');
+    currentBugId = null;
+}
+
+function handleFileSelection(e) {
+    const files = Array.from(e.target.files);
+    const preview = byId('evidencePreview');
+    preview.innerHTML = '';
+    
+    if (files.length > 5) {
+        alert('Máximo de 5 arquivos permitidos!');
+        e.target.value = '';
+        return;
+    }
+    
+    files.forEach((file, index) => {
+        const fileDiv = document.createElement('div');
+        fileDiv.className = 'file-preview';
+        
+        const fileName = document.createElement('div');
+        fileName.className = 'file-name';
+        fileName.textContent = file.name;
+        
+        const fileSize = document.createElement('div');
+        fileSize.className = 'file-size';
+        fileSize.textContent = formatFileSize(file.size);
+        
+        const fileType = document.createElement('div');
+        fileType.className = 'file-type';
+        fileType.textContent = file.type.split('/')[0]; // image ou video
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-file';
+        removeBtn.textContent = '❌';
+        removeBtn.onclick = () => removeFile(index, e.target);
+        
+        fileDiv.appendChild(fileName);
+        fileDiv.appendChild(fileSize);
+        fileDiv.appendChild(fileType);
+        fileDiv.appendChild(removeBtn);
+        preview.appendChild(fileDiv);
+    });
+}
+
+function removeFile(index, input) {
+    const dt = new DataTransfer();
+    const files = Array.from(input.files);
+    files.splice(index, 1);
+    files.forEach(file => dt.items.add(file));
+    input.files = dt.files;
+    handleFileSelection({ target: input });
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function handleEvidenceSubmit(e) {
+    e.preventDefault();
+    
+    if (!currentBugId) return;
+    
+    const files = Array.from(byId('evidenceFiles').files);
+    if (files.length === 0) {
+        alert('Selecione pelo menos um arquivo!');
+        return;
+    }
+    
+    const bug = state.bugs.find(b => b.id === currentBugId);
+    if (!bug) return;
+    
+    const evidence = {
+        id: nextId(),
+        files: files.map(f => ({ name: f.name, size: f.size, type: f.type })),
+        timestamp: new Date().toISOString()
+    };
+    
+    bug.evidence.push(evidence);
+    
+    closeEvidenceModal();
+    renderBugsList();
+    alert(`Evidências adicionadas com sucesso ao bug "${bug.title}"!`);
+}
+
 // Métricas e Burndown
 function updateMetrics() {
-    const testsTotal = state.requirements.reduce((acc, r) => acc + r.testCases.length, 0);
-    const testsExecuted = state.requirements.reduce((acc, r) => acc + r.testCases.filter(tc => tc.executed).length, 0);
+    const testsTotal = state.testCases.length;
+    const testsExecuted = state.testCases.filter(tc => tc.executed).length;
     const pct = testsTotal ? (testsExecuted / testsTotal) * 100 : 0;
     byId('metricTests').textContent = fmtPct(pct);
 
@@ -509,8 +608,8 @@ function updateMetrics() {
 }
 
 function updateDashboardMetrics() {
-    const testsTotal = state.requirements.reduce((acc, r) => acc + r.testCases.length, 0);
-    const testsExecuted = state.requirements.reduce((acc, r) => acc + r.testCases.filter(tc => tc.executed).length, 0);
+    const testsTotal = state.testCases.length;
+    const testsExecuted = state.testCases.filter(tc => tc.executed).length;
     const pct = testsTotal ? (testsExecuted / testsTotal) * 100 : 0;
     byId('dashboardMetricTests').textContent = fmtPct(pct);
 
