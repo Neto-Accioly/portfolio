@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jiraiya - Kanban, Documentação e Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header class="app-header">
+        <div class="brand">
+            <span class="logo">🌀</span>
+            <h1>Jiraiya</h1>
+        </div>
+        <div class="sprint-controls">
+            <label for="sprintEndDate">Fim da sprint:</label>
+            <input type="date" id="sprintEndDate" />
+            <button id="setSprint">Definir</button>
+            <div id="sprintCountdown" class="countdown">-- dias restantes</div>
+        </div>
+    </header>
+
+    <section class="toolbar">
+        <form id="newTaskForm" class="inline-form" autocomplete="off">
+            <strong>Nova Tarefa</strong>
+            <input type="text" id="taskTitle" placeholder="Título" required />
+            <input type="text" id="taskDescription" placeholder="Descrição" />
+            <select id="taskPriority" required>
+                <option value="Alta">Alta</option>
+                <option value="Média" selected>Média</option>
+                <option value="Baixa">Baixa</option>
+            </select>
+            <button type="submit">Adicionar</button>
+        </form>
+    </section>
+
+    <main class="layout">
+        <section class="kanban" aria-label="Quadro Kanban">
+            <div class="kanban-column" data-status="Backlog">
+                <div class="kanban-header">Backlog</div>
+                <div class="kanban-dropzone" data-status="Backlog"></div>
+            </div>
+            <div class="kanban-column" data-status="To Do">
+                <div class="kanban-header">To Do</div>
+                <div class="kanban-dropzone" data-status="To Do"></div>
+            </div>
+            <div class="kanban-column" data-status="In Progress">
+                <div class="kanban-header">In Progress <span class="wip">WIP ≤ 3</span></div>
+                <div class="kanban-dropzone" data-status="In Progress"></div>
+            </div>
+            <div class="kanban-column" data-status="Done">
+                <div class="kanban-header">Done</div>
+                <div class="kanban-dropzone" data-status="Done"></div>
+            </div>
+        </section>
+
+        <aside class="side-panel" aria-label="Painel Lateral">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="docsTab">Documentação</button>
+                <button class="tab-button" data-tab="bugsTab">Bugs</button>
+                <button class="tab-button" data-tab="dashboardTab">Dashboard</button>
+            </div>
+            <div class="tab-content">
+                <section id="docsTab" class="tab-pane active">
+                    <form id="newRequirementForm" class="inline-form" autocomplete="off">
+                        <strong>Novo Requisito</strong>
+                        <input type="text" id="reqTitle" placeholder="Título" required />
+                        <input type="text" id="reqDescription" placeholder="Descrição" />
+                        <button type="submit">Adicionar</button>
+                    </form>
+                    <div class="requirements">
+                        <div class="requirements-list">
+                            <h3>Requisitos</h3>
+                            <ul id="requirementsList"></ul>
+                        </div>
+                        <div class="requirement-details">
+                            <h3>Detalhes do Requisito</h3>
+                            <div id="requirementDetail">
+                                <p>Nenhum requisito selecionado.</p>
+                            </div>
+                            <div class="testcases">
+                                <div class="testcases-header">
+                                    <h4>Casos de Teste</h4>
+                                    <form id="newTestCaseForm" class="inline-form" autocomplete="off">
+                                        <input type="text" id="tcTitle" placeholder="Título do Caso" required />
+                                        <input type="text" id="tcSteps" placeholder="Passos" />
+                                        <button type="submit">Adicionar</button>
+                                    </form>
+                                </div>
+                                <ul id="testCasesList"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="bugsTab" class="tab-pane">
+                    <form id="newBugForm" class="inline-form" autocomplete="off">
+                        <strong>Novo Bug</strong>
+                        <input type="text" id="bugTitle" placeholder="Título" required />
+                        <input type="text" id="bugDescription" placeholder="Descrição" />
+                        <select id="bugPriority" required>
+                            <option value="Alta">Alta</option>
+                            <option value="Média" selected>Média</option>
+                            <option value="Baixa">Baixa</option>
+                        </select>
+                        <select id="bugStatus">
+                            <option value="Open" selected>Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                        <button type="submit">Adicionar</button>
+                    </form>
+                    <div class="bugs-list">
+                        <h3>Lista de Bugs</h3>
+                        <ul id="bugsList"></ul>
+                    </div>
+                </section>
+
+                <section id="dashboardTab" class="tab-pane">
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-title">Casos Executados</div>
+                            <div class="metric-value" id="metricTests">0%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Bugs (Abertos / Fechados)</div>
+                            <div class="metric-value" id="metricBugs">0 / 0</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Tarefas (Done / Total)</div>
+                            <div class="metric-value" id="metricTasks">0 / 0</div>
+                        </div>
+                    </div>
+                    <div class="chart">
+                        <h3>Burn-down simples (Concluídas vs. Pendentes)</h3>
+                        <canvas id="burndownCanvas" width="360" height="200"></canvas>
+                    </div>
+                </section>
+            </div>
+        </aside>
+    </main>
+
+    <div id="cardModal" class="modal" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalhes da Tarefa</h3>
+                <button class="close-modal" id="closeCardModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="editCardForm" class="stack-form" autocomplete="off">
+                    <input type="hidden" id="editCardId" />
+                    <label>Título
+                        <input type="text" id="editCardTitle" required />
+                    </label>
+                    <label>Descrição
+                        <textarea id="editCardDescription" rows="3"></textarea>
+                    </label>
+                    <label>Prioridade
+                        <select id="editCardPriority">
+                            <option value="Alta">Alta</option>
+                            <option value="Média">Média</option>
+                            <option value="Baixa">Baixa</option>
+                        </select>
+                    </label>
+                    <label>Status
+                        <select id="editCardStatus">
+                            <option value="Backlog">Backlog</option>
+                            <option value="To Do">To Do</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </label>
+                    <div class="modal-actions">
+                        <button type="submit">Salvar</button>
+                        <button type="button" id="deleteCard" class="danger">Excluir</button>
+                    </div>
+                </form>
+                <div class="comments">
+                    <h4>Comentários</h4>
+                    <ul id="commentsList"></ul>
+                    <form id="newCommentForm" class="inline-form" autocomplete="off">
+                        <input type="text" id="commentText" placeholder="Escreva um comentário" required />
+                        <input type="file" id="commentFiles" multiple />
+                        <button type="submit">Adicionar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <template id="cardTemplate">
+        <div class="card" draggable="true">
+            <div class="card-title"></div>
+            <div class="card-meta">
+                <span class="priority"></span>
+            </div>
+        </div>
+    </template>
+
+    <script src="app.js"></script>
+    <noscript>Ative o JavaScript para utilizar o Jiraiya.</noscript>
+    
+</body>
+</html>
+
+
