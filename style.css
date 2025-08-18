@@ -119,6 +119,15 @@ body {
 .stack-form input, .stack-form textarea, .stack-form select { background: var(--panel-2); color: var(--text); border: 1px solid #2c3560; padding: 8px 10px; border-radius: 8px; }
 .modal-actions { display: flex; justify-content: space-between; gap: 8px; }
 .modal-actions .danger { background: var(--danger); }
+.modal-actions .secondary { 
+    background: var(--panel-2); 
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+.modal-actions .secondary:hover { 
+    background: var(--accent-1); 
+    color: var(--bg);
+}
 
 .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.5); padding: 16px; }
 .modal.show { display: flex; }
@@ -133,6 +142,95 @@ body {
 .metric-title { color: var(--muted); font-size: 12px; }
 .metric-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
 .chart { background: var(--panel-2); border: 1px solid #2d3766; border-radius: 10px; padding: 10px; }
+
+.task-link-info {
+    margin-bottom: 12px;
+}
+
+.task-link-info div {
+    border-left: 4px solid var(--accent-2);
+}
+
+/* Estilos para as abas do modal */
+.modal-tabs {
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.tab-btn {
+    background: var(--panel-2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.tab-btn:hover:not(.active) {
+    background: var(--accent-1);
+    color: var(--bg);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.requirements-section, .bugs-section {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.requirements-section h4, .bugs-section h4 {
+    margin: 0 0 12px 0;
+    color: var(--text);
+}
+
+.testcases-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.testcases-section h5 {
+    margin: 0 0 12px 0;
+    color: var(--muted);
+}
+
+.requirements-list, .testcases-list, .bugs-list {
+    margin-top: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.requirements-list li, .testcases-list li, .bugs-list li {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
 
 @media (max-width: 1400px) {
     .kanban { grid-template-columns: repeat(4, 1fr); }

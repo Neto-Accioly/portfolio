@@ -33,7 +33,7 @@
                 <option value="Média" selected>Média</option>
                 <option value="Baixa">Baixa</option>
             </select>
-            <button type="submit">Adicionar à Fila</button>
+            <button type="submit">Adicionar ao Backlog</button>
         </form>
     </section>
 
@@ -72,71 +72,6 @@
                 <div class="kanban-dropzone" data-status="Pronto"></div>
             </div>
         </section>
-
-        <aside class="side-panel" aria-label="Painel Lateral">
-            <div class="tabs">
-                <button class="tab-button active" data-tab="docsTab">Documentação</button>
-                <button class="tab-button" data-tab="bugsTab">Bugs</button>
-            </div>
-            <div class="tab-content">
-                <section id="docsTab" class="tab-pane active">
-                    <form id="newRequirementForm" class="inline-form" autocomplete="off">
-                        <strong>Novo Requisito</strong>
-                        <input type="text" id="reqTitle" placeholder="Título" required />
-                        <input type="text" id="reqDescription" placeholder="Descrição" />
-                        <button type="submit">Adicionar</button>
-                    </form>
-                    <div class="requirements">
-                        <div class="requirements-list">
-                            <h3>Requisitos</h3>
-                            <ul id="requirementsList"></ul>
-                        </div>
-                        <div class="requirement-details">
-                            <h3>Detalhes do Requisito</h3>
-                            <div id="requirementDetail">
-                                <p>Nenhum requisito selecionado.</p>
-                            </div>
-                            <div class="testcases">
-                                <div class="testcases-header">
-                                    <h4>Casos de Teste</h4>
-                                    <form id="newTestCaseForm" class="inline-form" autocomplete="off">
-                                        <input type="text" id="tcTitle" placeholder="Título do Caso" required />
-                                        <input type="text" id="tcSteps" placeholder="Passos" />
-                                        <button type="submit">Adicionar</button>
-                                    </form>
-                                </div>
-                                <ul id="testCasesList"></ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="bugsTab" class="tab-pane">
-                    <form id="newBugForm" class="inline-form" autocomplete="off">
-                        <strong>Novo Bug</strong>
-                        <input type="text" id="bugTitle" placeholder="Título" required />
-                        <input type="text" id="bugDescription" placeholder="Descrição" />
-                        <select id="bugPriority" required>
-                            <option value="Alta">Alta</option>
-                            <option value="Média" selected>Média</option>
-                            <option value="Baixa">Baixa</option>
-                        </select>
-                        <select id="bugStatus">
-                            <option value="Open" selected>Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Closed">Closed</option>
-                        </select>
-                        <button type="submit">Adicionar</button>
-                    </form>
-                    <div class="bugs-list">
-                        <h3>Lista de Bugs</h3>
-                        <ul id="bugsList"></ul>
-                    </div>
-                </section>
-
-
-            </div>
-        </aside>
     </main>
 
     <div id="cardModal" class="modal" aria-hidden="true">
@@ -186,6 +121,60 @@
                         <input type="file" id="commentFiles" multiple />
                         <button type="submit">Adicionar</button>
                     </form>
+                </div>
+
+                <!-- Abas de Documentação e Bugs -->
+                <div class="modal-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="documentation">📋 Documentação</button>
+                        <button class="tab-btn" data-tab="bugs">🐛 Bugs</button>
+                    </div>
+                    
+                    <!-- Aba de Documentação -->
+                    <div id="documentationTab" class="tab-content active">
+                        <div class="requirements-section">
+                            <h4>Requisitos</h4>
+                            <form id="newRequirementForm" class="inline-form" autocomplete="off">
+                                <input type="text" id="reqTitle" placeholder="Título do Requisito" required />
+                                <input type="text" id="reqDescription" placeholder="Descrição" />
+                                <button type="submit">Adicionar Requisito</button>
+                            </form>
+                            <ul id="requirementsList" class="requirements-list"></ul>
+                            
+                            <div class="testcases-section">
+                                <h5>Casos de Teste</h5>
+                                <form id="newTestCaseForm" class="inline-form" autocomplete="off">
+                                    <input type="text" id="tcTitle" placeholder="Título do Caso de Teste" required />
+                                    <input type="text" id="tcSteps" placeholder="Passos" />
+                                    <button type="submit">Adicionar Caso de Teste</button>
+                                </form>
+                                <ul id="testCasesList" class="testcases-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Aba de Bugs -->
+                    <div id="bugsTab" class="tab-content">
+                        <div class="bugs-section">
+                            <h4>Bugs</h4>
+                            <form id="newBugForm" class="inline-form" autocomplete="off">
+                                <input type="text" id="bugTitle" placeholder="Título do Bug" required />
+                                <input type="text" id="bugDescription" placeholder="Descrição" />
+                                <select id="bugPriority" required>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Média" selected>Média</option>
+                                    <option value="Baixa">Baixa</option>
+                                </select>
+                                <select id="bugStatus">
+                                    <option value="Open" selected>Open</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                                <button type="submit">Adicionar Bug</button>
+                            </form>
+                            <ul id="bugsList" class="bugs-list"></ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

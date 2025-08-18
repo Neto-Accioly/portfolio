@@ -78,7 +78,7 @@ function bindNewTaskForm() {
         const description = byId('taskDescription').value.trim();
         const priority = byId('taskPriority').value;
         if (!title) return;
-        state.tasks.push({ id: nextId(), title, description, priority, status: 'Pendente Para Dev', comments: [] });
+        state.tasks.push({ id: nextId(), title, description, priority, status: 'Backlog', comments: [] });
         form.reset();
         renderKanban();
         updateMetrics();
@@ -150,6 +150,13 @@ function bindModal() {
     byId('closeCardModal').addEventListener('click', closeCardModal);
     byId('closeDashboardModal').addEventListener('click', closeDashboardModal);
     byId('dashboardBtn').addEventListener('click', openDashboardModal);
+    
+    // Bind das abas do modal
+    bindModalTabs();
+    
+    // Bind dos formulários de documentação e bugs
+    bindRequirementForms();
+    bindBugForm();
     byId('deleteCard').addEventListener('click', () => {
         const id = Number(byId('editCardId').value);
         const idx = state.tasks.findIndex(t => t.id === id);
@@ -204,6 +211,11 @@ function openCardModal(id) {
     byId('editCardPriority').value = t.priority;
     byId('editCardStatus').value = t.status;
     renderComments(t);
+    
+    // Renderizar documentação e bugs da tarefa
+    renderRequirementsList();
+    renderBugsList();
+    
     byId('cardModal').classList.add('show');
     byId('cardModal').setAttribute('aria-hidden', 'false');
 }
@@ -211,6 +223,33 @@ function openCardModal(id) {
 function closeCardModal() {
     byId('cardModal').classList.remove('show');
     byId('cardModal').setAttribute('aria-hidden', 'true');
+}
+
+
+
+function bindModalTabs() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            
+            // Remover classe active de todos os botões e conteúdos
+            tabButtons.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Adicionar classe active ao botão clicado
+            btn.classList.add('active');
+            
+            // Mostrar conteúdo da aba correspondente
+            if (targetTab === 'documentation') {
+                byId('documentationTab').classList.add('active');
+            } else if (targetTab === 'bugs') {
+                byId('bugsTab').classList.add('active');
+            }
+        });
+    });
 }
 
 function openDashboardModal() {
@@ -265,23 +304,33 @@ function bindRequirementForms() {
         const title = byId('reqTitle').value.trim();
         const description = byId('reqDescription').value.trim();
         if (!title) return;
-        const req = { id: nextId(), title, description, testCases: [] };
+        
+        const currentTaskId = Number(byId('editCardId').value);
+        const req = { id: nextId(), title, description, testCases: [], taskId: currentTaskId };
         state.requirements.push(req);
         form.reset();
         renderRequirementsList();
+        updateMetrics();
     });
+    
     const tcForm = byId('newTestCaseForm');
     tcForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (!selectedRequirementId) return;
-        const req = state.requirements.find(r => r.id === selectedRequirementId);
-        if (!req) return;
         const title = byId('tcTitle').value.trim();
         const steps = byId('tcSteps').value.trim();
         if (!title) return;
+        
+        // Adicionar caso de teste ao primeiro requisito da tarefa atual
+        const currentTaskId = Number(byId('editCardId').value);
+        const req = state.requirements.find(r => r.taskId === currentTaskId);
+        if (!req) {
+            alert('Adicione um requisito primeiro!');
+            return;
+        }
+        
         req.testCases.push({ id: nextId(), title, steps, executed: false });
         tcForm.reset();
-        renderRequirementDetail(req);
+        renderRequirementsList();
         updateMetrics();
     });
 }
@@ -289,15 +338,17 @@ function bindRequirementForms() {
 function renderRequirementsList() {
     const ul = byId('requirementsList');
     ul.innerHTML = '';
-    state.requirements.forEach((r) => {
+    
+    // Filtrar requisitos da tarefa atual
+    const currentTaskId = Number(byId('editCardId').value);
+    const taskRequirements = state.requirements.filter(r => r.taskId === currentTaskId);
+    
+    taskRequirements.forEach((r) => {
         const li = document.createElement('li');
-        if (r.id === selectedRequirementId) li.classList.add('active');
         const row = document.createElement('div');
         row.className = 'row';
         const title = document.createElement('div');
         title.textContent = r.title;
-        title.style.cursor = 'pointer';
-        title.addEventListener('click', () => { selectedRequirementId = r.id; renderRequirementsList(); });
         const actions = document.createElement('div');
         actions.className = 'row-actions';
         const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.textContent = 'Editar';
@@ -308,11 +359,20 @@ function renderRequirementsList() {
         row.appendChild(title); row.appendChild(actions);
         const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = r.description || '(sem descrição)';
         li.appendChild(row); li.appendChild(desc);
+        
+        // Mostrar casos de teste se existirem
+        if (r.testCases && r.testCases.length > 0) {
+            const testCasesDiv = document.createElement('div');
+            testCasesDiv.className = 'small';
+            testCasesDiv.style.marginTop = '8px';
+            testCasesDiv.style.paddingTop = '8px';
+            testCasesDiv.style.borderTop = '1px solid var(--border)';
+            testCasesDiv.innerHTML = `<strong>Casos de Teste:</strong> ${r.testCases.length} (${r.testCases.filter(tc => tc.executed).length} executados)`;
+            li.appendChild(testCasesDiv);
+        }
+        
         ul.appendChild(li);
     });
-    const detailHost = byId('requirementDetail');
-    const req = state.requirements.find(r => r.id === selectedRequirementId) || null;
-    if (req) renderRequirementDetail(req); else detailHost.innerHTML = '<p>Nenhum requisito selecionado.</p>';
 }
 
 function editRequirement(req) {
@@ -381,7 +441,9 @@ function bindBugForm() {
         const priority = byId('bugPriority').value;
         const status = byId('bugStatus').value;
         if (!title) return;
-        state.bugs.push({ id: nextId(), title, description, priority, status });
+        
+        const currentTaskId = Number(byId('editCardId').value);
+        state.bugs.push({ id: nextId(), title, description, priority, status, taskId: currentTaskId });
         form.reset();
         renderBugsList();
         updateMetrics();
@@ -391,7 +453,12 @@ function bindBugForm() {
 function renderBugsList() {
     const ul = byId('bugsList');
     ul.innerHTML = '';
-    state.bugs.forEach(b => {
+    
+    // Filtrar bugs da tarefa atual
+    const currentTaskId = Number(byId('editCardId').value);
+    const taskBugs = state.bugs.filter(b => b.taskId === currentTaskId);
+    
+    taskBugs.forEach(b => {
         const li = document.createElement('li'); li.className = 'bug-item';
         const row = document.createElement('div'); row.className = 'row';
         const title = document.createElement('div'); title.textContent = `${b.title} [${b.priority}]`;
