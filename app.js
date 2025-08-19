@@ -241,6 +241,7 @@ function buildCard(task) {
         menuTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
             menuDropdown.classList.toggle('show');
+            menuTrigger.setAttribute('aria-expanded', menuDropdown.classList.contains('show') ? 'true' : 'false');
         });
     }
     
@@ -263,14 +264,17 @@ function buildCard(task) {
     }
     
     // Fechar menu ao clicar fora
-    document.addEventListener('click', () => {
-        if (menuDropdown) menuDropdown.classList.remove('show');
-    });
+    // Evitar fechar ao interagir dentro do dropdown
+    if (menuDropdown) {
+        menuDropdown.addEventListener('click', (e) => e.stopPropagation());
+    }
     
     if (!task.locked) {
         node.addEventListener('dragstart', onDragStartCard);
         node.addEventListener('dblclick', () => openCardModal(task.id));
     }
+    // Não deixar o menu ser arrastado
+    if (menuTrigger) menuTrigger.setAttribute('draggable', 'false');
     return node;
 }
 
