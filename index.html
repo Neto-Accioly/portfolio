@@ -400,6 +400,24 @@
         </div>
     </div>
 
+    <!-- Modal de Detalhes de Requisito -->
+    <div id="requirementModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal-content requirement-modal">
+            <div class="modal-header">
+                <h3 id="requirementModalTitle">Requisito</h3>
+                <button class="close-modal" id="closeRequirementModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="req-detail-section">
+                    <h4 class="req-section-title">Descrição</h4>
+                    <p class="req-description" id="requirementModalDescription"></p>
+                    <h4 style="margin-top: 8px;">Regras de Negócio</h4>
+                    <ul id="requirementRulesList" class="req-rules-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Evidências -->
     <div id="evidenceModal" class="modal" aria-hidden="true">
         <div class="modal-content evidence-modal">
