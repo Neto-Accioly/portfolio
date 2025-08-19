@@ -8,6 +8,59 @@ const state = {
     taskSeq: 1,
 };
 
+// Requisitos bloqueados (sempre visíveis no Backlog, abaixo do card de boas-vindas)
+const REQUIREMENTS = [
+    { id: 'REQ-001', title: 'Report de Bugs', description: 'Permitir registro e gerenciamento de bugs por tarefa.', rules: [
+        'Cadastrar bug com título, descrição, prioridade e status.',
+        'Listar bugs no card com metadados visíveis (prioridade e status).',
+        'Editar e excluir bugs individualmente.',
+        'Anexar evidências aos bugs (ver requisito de Evidências).'
+    ]},
+    { id: 'REQ-002', title: 'Kanban com Drag & Drop e WIP', description: 'Fluxo com arrastar e soltar entre colunas e limite de WIP (≤3) em "Em Desenvolvimento".', rules: [
+        'Cards devem suportar drag & drop entre colunas.',
+        'Ao tentar exceder o WIP em "Em Desenvolvimento", alertar e negar a ação.',
+        'Atualizar métricas após movimentação.'
+    ]},
+    { id: 'REQ-003', title: 'Edição de Tarefas', description: 'Edição completa de tarefas via modal.', rules: [
+        'Editar título, descrição, prioridade, status e tipo.',
+        'Respeitar regra de WIP ao alterar status para "Em Desenvolvimento".',
+        'Duplo clique no card abre o modal.'
+    ]},
+    { id: 'REQ-004', title: 'Comentários com Anexos', description: 'Comentários por tarefa com anexos.', rules: [
+        'Cadastrar comentário com texto e/ou arquivos.',
+        'Listagem deve exibir nomes dos anexos.',
+        'Permitir edição e exclusão do comentário.'
+    ]},
+    { id: 'REQ-005', title: 'Casos de Teste', description: 'Cadastro e execução de casos de teste.', rules: [
+        'Criar, editar e excluir casos de teste.',
+        'Marcar/desmarcar execução (executado/pendente).',
+        'Refletir progresso nas métricas.'
+    ]},
+    { id: 'REQ-006', title: 'Evidências', description: 'Anexar evidências aos bugs com preview.', rules: [
+        'Selecionar um bug da tarefa antes de anexar evidências.',
+        'Aceitar imagens e vídeos; limitar a 5 arquivos por submissão.',
+        'Exibir preview com nome, tamanho e tipo.',
+        'Confirmar com modal de sucesso.'
+    ]},
+    { id: 'REQ-007', title: 'Dashboard', description: 'Métricas e burndown simples.', rules: [
+        'Mostrar % de casos executados.',
+        'Mostrar bugs abertos/fechados.',
+        'Mostrar tarefas done/total e gráfico simples.'
+    ]},
+    { id: 'REQ-008', title: 'Sprint e Countdown', description: 'Definir e exibir contagem regressiva da sprint.', rules: [
+        'Permitir configurar data de término da sprint.',
+        'Exibir dias restantes atualizando automaticamente.'
+    ]},
+    { id: 'REQ-009', title: 'Boas‑vindas', description: 'Modal de introdução sempre exibido no carregamento.', rules: [
+        'Modal responsivo explicando funcionalidades e atalhos.',
+        'Fechamento via botão e clique fora.'
+    ]},
+    { id: 'REQ-010', title: 'IDs de Tarefas', description: 'Identificador incremental amigável por tarefa.', rules: [
+        'Gerar no formato JRY-0001 e exibir no card.',
+        'Mostrar ID junto ao título no modal de exclusão.'
+    ]},
+];
+
 // Utilitários
 const byId = (id) => document.getElementById(id);
 const fmtPct = (n) => `${Math.round(n)}%`;
@@ -99,9 +152,10 @@ function renderKanban() {
         zone.innerHTML = '';
         
         // Se for a coluna Backlog e não houver tarefas, mostrar card de boas-vindas
-        if (st === 'Backlog' && state.tasks.filter(t => t.status === st).length === 0) {
+        if (st === 'Backlog') {
             const welcomeCard = createWelcomeCard();
             zone.appendChild(welcomeCard);
+            renderRequirementCards(zone);
         }
         
         state.tasks.filter(t => t.status === st).forEach(task => {
@@ -146,8 +200,14 @@ function buildCard(task) {
     const node = tmpl.content.firstElementChild.cloneNode(true);
     node.dataset.id = task.id;
     
+    // Se for um card travado (não usado por enquanto para tasks), evitar qualquer interação
+    if (task.locked) {
+        node.setAttribute('draggable', 'false');
+        const menu = node.querySelector('.card-menu');
+        if (menu) menu.remove();
+    }
+
     // Configurar título e tipo da tarefa
-    // Título e ID amigável
     const titleTextEl = node.querySelector('.card-title-text');
     const idBadgeEl = node.querySelector('.card-id');
     if (titleTextEl) titleTextEl.textContent = task.title;
@@ -166,34 +226,107 @@ function buildCard(task) {
     const menuTrigger = node.querySelector('.menu-trigger');
     const menuDropdown = node.querySelector('.menu-dropdown');
     
-    // Toggle do menu
-    menuTrigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menuDropdown.classList.toggle('show');
-    });
+    // Toggle do menu (somente se existir)
+    if (menuTrigger) {
+        menuTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuDropdown.classList.toggle('show');
+        });
+    }
     
     // Botão editar
     const editBtn = node.querySelector('.edit-task');
-    editBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openCardModal(task.id);
-    });
+    if (editBtn) {
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openCardModal(task.id);
+        });
+    }
     
     // Botão deletar
     const deleteBtn = node.querySelector('.delete-task');
-    deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openDeleteConfirmModal(task);
-    });
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openDeleteConfirmModal(task);
+        });
+    }
     
     // Fechar menu ao clicar fora
     document.addEventListener('click', () => {
-        menuDropdown.classList.remove('show');
+        if (menuDropdown) menuDropdown.classList.remove('show');
     });
     
-    node.addEventListener('dragstart', onDragStartCard);
-    node.addEventListener('dblclick', () => openCardModal(task.id));
+    if (!task.locked) {
+        node.addEventListener('dragstart', onDragStartCard);
+        node.addEventListener('dblclick', () => openCardModal(task.id));
+    }
     return node;
+}
+
+// Renderiza os cards de requisitos (travados) abaixo do card de boas-vindas
+function renderRequirementCards(zone) {
+    REQUIREMENTS.forEach((req) => {
+        const card = buildRequirementCard(req);
+        zone.appendChild(card);
+    });
+}
+
+function buildRequirementCard(req) {
+    const card = document.createElement('div');
+    card.className = 'requirement-card';
+    card.id = `req-${req.id}`;
+    card.dataset.reqId = req.id;
+
+    const header = document.createElement('div');
+    header.className = 'req-header';
+
+    const idBadge = document.createElement('span');
+    idBadge.className = 'req-id';
+    idBadge.textContent = req.id;
+
+    const title = document.createElement('span');
+    title.className = 'req-title';
+    title.textContent = req.title;
+
+    const body = document.createElement('div');
+    body.className = 'req-body';
+    body.textContent = req.description;
+
+    header.appendChild(idBadge);
+    header.appendChild(title);
+    card.appendChild(header);
+    card.appendChild(body);
+    card.addEventListener('click', () => openRequirementModal(req));
+    return card;
+}
+
+// Modal de Requisito
+function openRequirementModal(req) {
+    byId('requirementModalTitle').textContent = `${req.id} — Funcionalidade: ${req.title}`;
+    byId('requirementModalDescription').textContent = req.description || '';
+    const ul = byId('requirementRulesList');
+    ul.innerHTML = '';
+    (req.rules || []).forEach(rule => {
+        const li = document.createElement('li');
+        li.textContent = rule;
+        ul.appendChild(li);
+    });
+    const modal = byId('requirementModal');
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const closeReq = byId('closeRequirementModal');
+    if (closeReq) closeReq.addEventListener('click', closeRequirementModal);
+});
+
+function closeRequirementModal() {
+    const modal = byId('requirementModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
 }
 
 function bindKanbanDropzones() {

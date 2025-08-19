@@ -149,6 +149,50 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+/* Requisitos bloqueados (cards responsivos, sem drag) */
+.requirement-card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: var(--shadow);
+    cursor: default;
+}
+
+.requirement-card * { user-select: text; }
+.requirement-card[draggable="true"] { draggable: false; }
+
+.req-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.req-id {
+    background: var(--panel);
+    color: var(--accent-2);
+    border: 1px solid var(--border);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.req-title {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.req-body {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
 .welcome-header {
     margin-bottom: 8px;
 }
@@ -509,11 +553,48 @@ body {
 .edit-testcase-modal { width: 500px; }
 .edit-bug-modal { width: 550px; }
 .edit-comment-modal { width: 500px; }
+.requirement-modal { width: 720px; max-width: 95vw; }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--panel); z-index: 10; }
 .modal-title { display: flex; align-items: center; gap: 10px; }
 .modal-title h3 { margin: 0; }
 .modal-logo svg { display: block; }
 .modal-body { padding: 16px; display: grid; gap: 20px; }
+.req-detail-section {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.req-section-title { margin: 0 0 8px 0; color: var(--text); font-weight: 600; }
+
+.req-description { color: var(--muted); margin: 6px 0 10px; line-height: 1.5; }
+
+/* Título do modal de requisito como "tag" */
+#requirementModalTitle {
+    display: inline-block;
+    margin: 0;
+    background: var(--panel);
+    color: var(--accent-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+    max-width: calc(100% - 48px); /* espaço para o botão fechar */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.req-rules-list { list-style: disc; padding-left: 18px; display: grid; gap: 8px; color: var(--text); }
+.req-rules-list li { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); }
+
+@media (max-width: 600px) {
+    .requirement-modal { width: 95vw; }
+}
 .close-modal { background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; cursor: pointer; }
 
 /* Estilos do modal de apresentação */
