@@ -5,12 +5,15 @@ const state = {
     bugs: [], // {id, title, description, priority, status, evidence: [{id, files: [name], type: string}]}
     sprintEnd: null,
     seq: 1,
+    taskSeq: 1,
 };
 
 // Utilitários
 const byId = (id) => document.getElementById(id);
 const fmtPct = (n) => `${Math.round(n)}%`;
 const nextId = () => state.seq++;
+const formatTaskKey = (n) => `JRY-${String(n).padStart(4, '0')}`;
+const nextTaskKey = () => formatTaskKey(state.taskSeq++);
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
@@ -80,7 +83,8 @@ function bindNewTaskForm() {
         const description = byId('taskDescription').value.trim();
         const priority = byId('taskPriority').value;
         if (!title) return;
-        state.tasks.push({ id: nextId(), title, description, priority, status: 'Backlog', type: 'Feature', comments: [] });
+        const taskKey = nextTaskKey();
+        state.tasks.push({ id: nextId(), taskKey, title, description, priority, status: 'Backlog', type: 'Feature', comments: [] });
         form.reset();
         renderKanban();
         updateMetrics();
@@ -143,7 +147,11 @@ function buildCard(task) {
     node.dataset.id = task.id;
     
     // Configurar título e tipo da tarefa
-    node.querySelector('.card-title').textContent = task.title;
+    // Título e ID amigável
+    const titleTextEl = node.querySelector('.card-title-text');
+    const idBadgeEl = node.querySelector('.card-id');
+    if (titleTextEl) titleTextEl.textContent = task.title;
+    if (idBadgeEl) idBadgeEl.textContent = task.taskKey || formatTaskKey(task.id);
     node.querySelector('.card-type').textContent = task.type || 'Feature';
     node.querySelector('.card-type').className = `card-type ${task.type || 'Feature'}`;
     
@@ -331,7 +339,7 @@ let taskToDelete = null;
 
 function openDeleteConfirmModal(task) {
     taskToDelete = task;
-    byId('deleteTaskTitle').textContent = task.title;
+    byId('deleteTaskTitle').textContent = `${task.taskKey || formatTaskKey(task.id)} — ${task.title}`;
     byId('deleteConfirmModal').classList.add('show');
     byId('deleteConfirmModal').setAttribute('aria-hidden', 'false');
 }
