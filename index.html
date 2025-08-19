@@ -60,20 +60,6 @@
                             <div class="welcome-icon">🚀</div>
                             <h3>Bem-vindo ao Jiraiya!</h3>
                         </div>
-                        <div class="quick-stats">
-                            <div class="stat-item">
-                                <div class="stat-number" id="welcomeTotalTasks">0</div>
-                                <div class="stat-label">Tarefas</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="welcomeCompletedTasks">0</div>
-                                <div class="stat-label">Concluídas</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="welcomeTestCases">0</div>
-                                <div class="stat-label">Casos de Teste</div>
-                            </div>
-                        </div>
                         <div class="welcome-tips">
                             <p>💡 <strong>Dica:</strong> Clique duas vezes em uma tarefa para editar</p>
                             <p>📊 Use o Dashboard para ver estatísticas do projeto</p>
@@ -465,6 +451,43 @@
                     <div class="evidence-success-actions">
                         <button type="button" class="evidence-success-close" id="closeEvidenceSuccess">✅ Fechar</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Apresentação (Boas-vindas) -->
+    <div id="welcomeIntroModal" class="modal" aria-hidden="true">
+        <div class="modal-content intro-modal">
+            <div class="modal-header">
+                <h3>🚀 Bem-vindo ao Jiraiya</h3>
+                <button class="close-modal" id="closeWelcomeIntroModal" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="intro-hero">
+                    <p>Jiraiya é uma plataforma leve para gestão de projetos com Kanban, documentação de casos de teste e acompanhamento de bugs, com métricas simples para o dia a dia.</p>
+                </div>
+                <div class="intro-grid">
+                    <div class="intro-section">
+                        <h4>📋 Funcionalidades</h4>
+                        <ul class="intro-list">
+                            <li>Gestão de tarefas com drag & drop</li>
+                            <li>Documentação de casos de teste</li>
+                            <li>Controle de bugs e evidências</li>
+                            <li>Dashboard com métricas</li>
+                        </ul>
+                    </div>
+                    <div class="intro-section">
+                        <h4>⚡ Atalhos</h4>
+                        <ul class="intro-list">
+                            <li>Duplo clique: Editar tarefa</li>
+                            <li>Arrastar: Mover entre colunas</li>
+                            <li>⋮ Menu: Ações rápidas</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="intro-actions">
+                    <button type="button" class="intro-close" id="startUsingJiraiya">✅ Começar</button>
                 </div>
             </div>
         </div>
