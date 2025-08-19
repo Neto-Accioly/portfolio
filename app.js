@@ -177,7 +177,7 @@ function bindNewTaskForm() {
 }
 
 function renderKanban() {
-    const statuses = ['Backlog', 'Pendente Para Dev', 'Em Desenvolvimento', 'Code Review', 'Pendente para QA', 'Em Testes', 'Pendente de Aprovação', 'Pronto'];
+    const statuses = ['Backlog', 'Pendente Para Dev', 'Em Desenvolvimento', 'Code Review', 'Pendente para QA', 'Em Testes', 'Fixing', 'Pronto'];
     statuses.forEach((st) => {
         const zone = document.querySelector(`.kanban-dropzone[data-status="${st}"]`);
         if (!zone) return;
