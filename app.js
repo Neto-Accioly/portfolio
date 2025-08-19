@@ -5,12 +5,15 @@ const state = {
     bugs: [], // {id, title, description, priority, status, evidence: [{id, files: [name], type: string}]}
     sprintEnd: null,
     seq: 1,
+    taskSeq: 1,
 };
 
 // Utilitários
 const byId = (id) => document.getElementById(id);
 const fmtPct = (n) => `${Math.round(n)}%`;
 const nextId = () => state.seq++;
+const formatTaskKey = (n) => `JRY-${String(n).padStart(4, '0')}`;
+const nextTaskKey = () => formatTaskKey(state.taskSeq++);
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindBugForm();
     bindEvidenceModal();
     bindModal();
+    bindWelcomeIntroModal();
     renderAll();
 });
 
@@ -79,7 +83,8 @@ function bindNewTaskForm() {
         const description = byId('taskDescription').value.trim();
         const priority = byId('taskPriority').value;
         if (!title) return;
-        state.tasks.push({ id: nextId(), title, description, priority, status: 'Backlog', type: 'Feature', comments: [] });
+        const taskKey = nextTaskKey();
+        state.tasks.push({ id: nextId(), taskKey, title, description, priority, status: 'Backlog', type: 'Feature', comments: [] });
         form.reset();
         renderKanban();
         updateMetrics();
@@ -105,8 +110,7 @@ function renderKanban() {
         });
     });
     
-    // Atualizar estatísticas do card de boas-vindas
-    updateWelcomeStats();
+    // Estatísticas removidas do card de boas-vindas
 }
 
 // Função para criar o card de boas-vindas
@@ -115,22 +119,16 @@ function createWelcomeCard() {
     welcomeDiv.className = 'welcome-card';
     welcomeDiv.innerHTML = `
         <div class="welcome-header">
-            <div class="welcome-icon">🚀</div>
+            <div class="welcome-icon">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="15" fill="#87CEEB" stroke="#5F9EA0" stroke-width="1"/>
+                    <path d="M16 4 L20 12 L28 16 L20 20 L16 28 L12 20 L4 16 L12 12 Z" fill="#696969"/>
+                    <path d="M16 6 L18.5 12 L24 16 L18.5 20 L16 26 L13.5 20 L8 16 L13.5 12 Z" fill="#808080"/>
+                    <path d="M16 8 L17 12 L20 16 L17 20 L16 24 L15 20 L12 16 L15 12 Z" fill="#A9A9A9"/>
+                    <ellipse cx="20" cy="22" rx="8" ry="3" fill="#4682B4" opacity="0.6"/>
+                </svg>
+            </div>
             <h3>Bem-vindo ao Jiraiya!</h3>
-        </div>
-        <div class="quick-stats">
-            <div class="stat-item">
-                <div class="stat-number" id="welcomeTotalTasks">0</div>
-                <div class="stat-label">Tarefas</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="welcomeCompletedTasks">0</div>
-                <div class="stat-label">Concluídas</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="welcomeTestCases">0</div>
-                <div class="stat-label">Casos de Teste</div>
-            </div>
         </div>
         <div class="welcome-tips">
             <p>💡 <strong>Dica:</strong> Clique duas vezes em uma tarefa para editar</p>
@@ -141,20 +139,7 @@ function createWelcomeCard() {
 }
 
 // Função para atualizar as estatísticas do card de boas-vindas
-function updateWelcomeStats() {
-    const totalTasks = state.tasks.length;
-    const completedTasks = state.tasks.filter(t => t.status === 'Pronto').length;
-    const totalTestCases = state.testCases.length;
-    
-    // Atualizar elementos se existirem
-    const totalTasksEl = document.getElementById('welcomeTotalTasks');
-    const completedTasksEl = document.getElementById('welcomeCompletedTasks');
-    const testCasesEl = document.getElementById('welcomeTestCases');
-    
-    if (totalTasksEl) totalTasksEl.textContent = totalTasks;
-    if (completedTasksEl) completedTasksEl.textContent = completedTasks;
-    if (testCasesEl) testCasesEl.textContent = totalTestCases;
-}
+// Estatísticas removidas do card de boas-vindas
 
 function buildCard(task) {
     const tmpl = byId('cardTemplate');
@@ -162,7 +147,11 @@ function buildCard(task) {
     node.dataset.id = task.id;
     
     // Configurar título e tipo da tarefa
-    node.querySelector('.card-title').textContent = task.title;
+    // Título e ID amigável
+    const titleTextEl = node.querySelector('.card-title-text');
+    const idBadgeEl = node.querySelector('.card-id');
+    if (titleTextEl) titleTextEl.textContent = task.title;
+    if (idBadgeEl) idBadgeEl.textContent = task.taskKey || formatTaskKey(task.id);
     node.querySelector('.card-type').textContent = task.type || 'Feature';
     node.querySelector('.card-type').className = `card-type ${task.type || 'Feature'}`;
     
@@ -268,9 +257,10 @@ function bindModal() {
             else if (e.target.id === 'bugSelectionModal') closeBugSelectionModal();
             else if (e.target.id === 'editTestCaseModal') closeEditTestCaseModal();
             else if (e.target.id === 'editBugModal') closeEditBugModal();
-                    else if (e.target.id === 'editCommentModal') closeEditCommentModal();
-        else if (e.target.id === 'deleteConfirmModal') closeDeleteConfirmModal();
-        else if (e.target.id === 'evidenceSuccessModal') closeEvidenceSuccessModal();
+            else if (e.target.id === 'editCommentModal') closeEditCommentModal();
+            else if (e.target.id === 'deleteConfirmModal') closeDeleteConfirmModal();
+            else if (e.target.id === 'evidenceSuccessModal') closeEvidenceSuccessModal();
+            else if (e.target.id === 'welcomeIntroModal') closeWelcomeIntroModal();
     }
 });
     
@@ -349,7 +339,7 @@ let taskToDelete = null;
 
 function openDeleteConfirmModal(task) {
     taskToDelete = task;
-    byId('deleteTaskTitle').textContent = task.title;
+    byId('deleteTaskTitle').textContent = `${task.taskKey || formatTaskKey(task.id)} — ${task.title}`;
     byId('deleteConfirmModal').classList.add('show');
     byId('deleteConfirmModal').setAttribute('aria-hidden', 'false');
 }
@@ -902,6 +892,24 @@ function showEvidenceSuccessModal(bug) {
     byId('successBugPriority').textContent = bug.priority;
     byId('successBugStatus').textContent = bug.status;
     
+    // Atualizar ícone de sucesso se fornecido via configuração global
+    try {
+        const iconEl = byId('evidenceSuccessIcon');
+        const fallbackEl = document.querySelector('#evidenceSuccessModal .success-fallback');
+        const src = (window.JIRAIYA_ICONS && window.JIRAIYA_ICONS.evidenceSuccess) || '';
+        if (iconEl) {
+            if (src) {
+                iconEl.src = src;
+                iconEl.style.display = 'block';
+                if (fallbackEl) fallbackEl.style.display = 'none';
+            } else {
+                iconEl.removeAttribute('src');
+                iconEl.style.display = 'none';
+                if (fallbackEl) fallbackEl.style.display = 'inline';
+            }
+        }
+    } catch (_) {}
+
     byId('evidenceSuccessModal').classList.add('show');
     byId('evidenceSuccessModal').setAttribute('aria-hidden', 'false');
 }
@@ -909,6 +917,32 @@ function showEvidenceSuccessModal(bug) {
 function closeEvidenceSuccessModal() {
     byId('evidenceSuccessModal').classList.remove('show');
     byId('evidenceSuccessModal').setAttribute('aria-hidden', 'true');
+}
+
+// Modal de apresentação (boas-vindas)
+function bindWelcomeIntroModal() {
+    const closeBtn = byId('closeWelcomeIntroModal');
+    const startBtn = byId('startUsingJiraiya');
+    if (closeBtn) closeBtn.addEventListener('click', closeWelcomeIntroModal);
+    if (startBtn) startBtn.addEventListener('click', closeWelcomeIntroModal);
+
+    // Abrir sempre ao carregar a página
+    try { sessionStorage.removeItem('jiraiya_intro_seen'); } catch(_) {}
+    openWelcomeIntroModal();
+}
+
+function openWelcomeIntroModal() {
+    const modal = byId('welcomeIntroModal');
+    if (!modal) return;
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeWelcomeIntroModal() {
+    const modal = byId('welcomeIntroModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
 }
 
 // Métricas e Burndown
@@ -926,8 +960,7 @@ function updateMetrics() {
     const tasksTotal = state.tasks.length;
     byId('metricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
     
-    // Atualizar também as estatísticas do card de boas-vindas
-    updateWelcomeStats();
+    // Estatísticas do card de boas-vindas removidas
 }
 
 function updateDashboardMetrics() {
