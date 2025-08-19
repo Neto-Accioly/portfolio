@@ -603,6 +603,7 @@ function handleConfirmDelete() {
         const idx = state.tasks.findIndex(t => t.id === taskToDelete.id);
         if (idx >= 0) {
             state.tasks.splice(idx, 1);
+            saveState();
             renderKanban();
             updateMetrics();
         }
