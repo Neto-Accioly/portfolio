@@ -160,7 +160,6 @@ body {
 }
 
 .requirement-card * { user-select: text; }
-.requirement-card[draggable="true"] { draggable: false; }
 
 .req-header {
     display: flex;

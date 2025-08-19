@@ -151,17 +151,27 @@ function renderKanban() {
         if (!zone) return;
         zone.innerHTML = '';
         
-        // Se for a coluna Backlog e não houver tarefas, mostrar card de boas-vindas
         if (st === 'Backlog') {
-            const welcomeCard = createWelcomeCard();
-            zone.appendChild(welcomeCard);
+            const backlogTasks = state.tasks.filter(t => t.status === st);
+            // Card de boas-vindas só quando não há tarefas no Backlog
+            if (backlogTasks.length === 0) {
+                const welcomeCard = createWelcomeCard();
+                zone.appendChild(welcomeCard);
+            }
+            // Tarefas do Backlog logo abaixo
+            backlogTasks.forEach(task => {
+                const card = buildCard(task);
+                zone.appendChild(card);
+            });
+            // Requisitos fixos sempre ao final da coluna Backlog
             renderRequirementCards(zone);
+        } else {
+            // Demais colunas: apenas tarefas do status
+            state.tasks.filter(t => t.status === st).forEach(task => {
+                const card = buildCard(task);
+                zone.appendChild(card);
+            });
         }
-        
-        state.tasks.filter(t => t.status === st).forEach(task => {
-            const card = buildCard(task);
-            zone.appendChild(card);
-        });
     });
     
     // Estatísticas removidas do card de boas-vindas
@@ -277,6 +287,7 @@ function buildRequirementCard(req) {
     card.className = 'requirement-card';
     card.id = `req-${req.id}`;
     card.dataset.reqId = req.id;
+    card.setAttribute('draggable', 'false');
 
     const header = document.createElement('div');
     header.className = 'req-header';
