@@ -59,6 +59,38 @@ const REQUIREMENTS = [
         'Gerar no formato JRY-0001 e exibir no card.',
         'Mostrar ID junto ao título no modal de exclusão.'
     ]},
+    { id: 'REQ-011', title: 'Seleção de Bug para Evidências', description: 'Permitir escolher um bug existente da tarefa antes de anexar evidências.', rules: [
+        'Listar bugs da tarefa atual em modal dedicado.',
+        'Realçar item selecionado e prosseguir para o modal de evidências.'
+    ]},
+    { id: 'REQ-012', title: 'Confirmação de Exclusão', description: 'Modal de confirmação antes de excluir uma tarefa.', rules: [
+        'Exibir título/ID da tarefa no texto de confirmação.',
+        'Ação destrutiva claramente destacada e cancelável.'
+    ]},
+    { id: 'REQ-013', title: 'Sucesso ao Salvar Evidências', description: 'Exibir modal de sucesso após anexar evidências a um bug.', rules: [
+        'Mostrar resumo: bug, prioridade e status.',
+        'Permitir fechar e retornar ao contexto.'
+    ]},
+    { id: 'REQ-014', title: 'Edição de Caso de Teste', description: 'Modal dedicado para editar a descrição do caso de teste.', rules: [
+        'Validar descrição obrigatória.',
+        'Atualizar a lista e as métricas após salvar.'
+    ]},
+    { id: 'REQ-015', title: 'Edição de Bug', description: 'Modal dedicado para editar título, descrição, prioridade e status do bug.', rules: [
+        'Validar título obrigatório.',
+        'Refletir alterações na lista de bugs.'
+    ]},
+    { id: 'REQ-016', title: 'Edição de Comentário', description: 'Modal dedicado para editar texto de comentários.', rules: [
+        'Validar texto obrigatório.',
+        'Atualizar a lista de comentários na tarefa.'
+    ]},
+    { id: 'REQ-017', title: 'Atalhos e Interações', description: 'Operações rápidas e acessíveis nos cards.', rules: [
+        'Duplo clique abre o modal de edição da tarefa.',
+        'Menu de ações acessível pelo botão com três pontos.'
+    ]},
+    { id: 'REQ-018', title: 'Responsividade e Acessibilidade', description: 'Layout e modais devem se adaptar e manter contraste.', rules: [
+        'Modais com largura máxima fluida em telas pequenas.',
+        'Cores com contraste adequado para leitura.'
+    ]},
 ];
 
 // Utilitários
@@ -241,6 +273,7 @@ function buildCard(task) {
         menuTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
             menuDropdown.classList.toggle('show');
+            menuTrigger.setAttribute('aria-expanded', menuDropdown.classList.contains('show') ? 'true' : 'false');
         });
     }
     
@@ -263,14 +296,17 @@ function buildCard(task) {
     }
     
     // Fechar menu ao clicar fora
-    document.addEventListener('click', () => {
-        if (menuDropdown) menuDropdown.classList.remove('show');
-    });
+    // Evitar fechar ao interagir dentro do dropdown
+    if (menuDropdown) {
+        menuDropdown.addEventListener('click', (e) => e.stopPropagation());
+    }
     
     if (!task.locked) {
         node.addEventListener('dragstart', onDragStartCard);
         node.addEventListener('dblclick', () => openCardModal(task.id));
     }
+    // Não deixar o menu ser arrastado
+    if (menuTrigger) menuTrigger.setAttribute('draggable', 'false');
     return node;
 }
 
