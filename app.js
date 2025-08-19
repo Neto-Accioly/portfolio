@@ -115,7 +115,15 @@ function createWelcomeCard() {
     welcomeDiv.className = 'welcome-card';
     welcomeDiv.innerHTML = `
         <div class="welcome-header">
-            <div class="welcome-icon">🚀</div>
+            <div class="welcome-icon">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="15" fill="#87CEEB" stroke="#5F9EA0" stroke-width="1"/>
+                    <path d="M16 4 L20 12 L28 16 L20 20 L16 28 L12 20 L4 16 L12 12 Z" fill="#696969"/>
+                    <path d="M16 6 L18.5 12 L24 16 L18.5 20 L16 26 L13.5 20 L8 16 L13.5 12 Z" fill="#808080"/>
+                    <path d="M16 8 L17 12 L20 16 L17 20 L16 24 L15 20 L12 16 L15 12 Z" fill="#A9A9A9"/>
+                    <ellipse cx="20" cy="22" rx="8" ry="3" fill="#4682B4" opacity="0.6"/>
+                </svg>
+            </div>
             <h3>Bem-vindo ao Jiraiya!</h3>
         </div>
         <div class="welcome-tips">
@@ -876,6 +884,24 @@ function showEvidenceSuccessModal(bug) {
     byId('successBugPriority').textContent = bug.priority;
     byId('successBugStatus').textContent = bug.status;
     
+    // Atualizar ícone de sucesso se fornecido via configuração global
+    try {
+        const iconEl = byId('evidenceSuccessIcon');
+        const fallbackEl = document.querySelector('#evidenceSuccessModal .success-fallback');
+        const src = (window.JIRAIYA_ICONS && window.JIRAIYA_ICONS.evidenceSuccess) || '';
+        if (iconEl) {
+            if (src) {
+                iconEl.src = src;
+                iconEl.style.display = 'block';
+                if (fallbackEl) fallbackEl.style.display = 'none';
+            } else {
+                iconEl.removeAttribute('src');
+                iconEl.style.display = 'none';
+                if (fallbackEl) fallbackEl.style.display = 'inline';
+            }
+        }
+    } catch (_) {}
+
     byId('evidenceSuccessModal').classList.add('show');
     byId('evidenceSuccessModal').setAttribute('aria-hidden', 'false');
 }
@@ -892,17 +918,9 @@ function bindWelcomeIntroModal() {
     if (closeBtn) closeBtn.addEventListener('click', closeWelcomeIntroModal);
     if (startBtn) startBtn.addEventListener('click', closeWelcomeIntroModal);
 
-    // Abrir automaticamente apenas na primeira visita da sessão
-    try {
-        const seen = sessionStorage.getItem('jiraiya_intro_seen');
-        if (!seen) {
-            openWelcomeIntroModal();
-            sessionStorage.setItem('jiraiya_intro_seen', '1');
-        }
-    } catch (_) {
-        // Fallback caso sessionStorage não esteja disponível
-        openWelcomeIntroModal();
-    }
+    // Abrir sempre ao carregar a página
+    try { sessionStorage.removeItem('jiraiya_intro_seen'); } catch(_) {}
+    openWelcomeIntroModal();
 }
 
 function openWelcomeIntroModal() {

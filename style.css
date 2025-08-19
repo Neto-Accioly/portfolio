@@ -52,8 +52,13 @@ body {
 }
 .brand h1 { margin: 0; font-size: 20px; letter-spacing: .5px; }
 
-.sprint-controls { display: flex; align-items: center; gap: 10px; color: var(--muted); }
-.countdown { background: var(--panel-2); padding: 6px 10px; border-radius: 6px; color: var(--text); }
+.sprint-controls { display: flex; align-items: center; gap: 12px; color: var(--muted); background: var(--panel-2); padding: 6px 10px; border-radius: 8px; border: 1px solid #2c3560; }
+.sprint-controls label { font-weight: 600; }
+.sprint-controls input[type="date"] { background: var(--panel); color: var(--text); border: 1px solid #2c3560; padding: 8px 10px; border-radius: 8px; outline: none; }
+.sprint-controls input[type="date"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(108,140,255,.35); }
+.sprint-controls button { background: var(--accent); border: 1px solid var(--accent); color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+.sprint-controls button:hover { background: #5a7aff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(108,140,255,.3); }
+.countdown { background: transparent; padding: 6px 10px; border-radius: 6px; color: var(--text); border: 1px solid #2c3560; font-weight: 600; }
 
 .header-actions { display: flex; align-items: center; gap: 10px; }
 .dashboard-btn { 
@@ -167,6 +172,8 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
+/* Ajuste do SVG dentro do ícone de boas-vindas */
+.welcome-icon svg { width: clamp(22px, 3.5vw, 30px); height: clamp(22px, 3.5vw, 30px); display: inline-block; }
 
 /* quick-stats removido */
 
@@ -373,19 +380,30 @@ body {
     display: grid;
     gap: 12px;
     margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #2d3766;
+    padding: 12px;
+    border: 1px solid #2c3560;
+    border-radius: 10px;
+    background: var(--panel-2);
 }
 
 .testcase-form textarea {
     width: 100%;
     resize: vertical;
-    min-height: 80px;
+    min-height: 90px;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid #2c3560;
+    border-radius: 10px;
+    padding: 10px 12px;
 }
 
 .bug-form {
     display: grid;
     gap: 16px;
+    padding: 12px;
+    border: 1px solid #2c3560;
+    border-radius: 10px;
+    background: var(--panel-2);
 }
 
 .bug-input-row {
@@ -397,10 +415,20 @@ body {
 
 .bug-input-row input[type="text"] {
     min-width: 200px;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid #2c3560;
+    border-radius: 8px;
+    padding: 8px 10px;
 }
 
 .bug-input-row select {
     min-width: 120px;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid #2c3560;
+    border-radius: 8px;
+    padding: 8px 10px;
 }
 
 .bug-description-row {
@@ -411,7 +439,12 @@ body {
 .bug-description-row textarea {
     width: 100%;
     resize: vertical;
-    min-height: 80px;
+    min-height: 90px;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid #2c3560;
+    border-radius: 10px;
+    padding: 10px 12px;
 }
 
 .bug-actions {
@@ -431,6 +464,13 @@ body {
 .stack-form label { display: flex; flex-direction: column; gap: 6px; }
 .stack-form label strong { color: var(--text); font-weight: 600; font-size: 14px; }
 .stack-form input, .stack-form textarea, .stack-form select { background: var(--panel-2); color: var(--text); border: 1px solid #2c3560; padding: 10px 12px; border-radius: 8px; font-size: 14px; }
+.stack-form input:focus, .stack-form textarea:focus, .stack-form select:focus,
+.bug-input-row input[type="text"]:focus, .bug-input-row select:focus,
+.bug-description-row textarea:focus, .testcase-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(108,140,255,.35);
+}
 .modal-actions { display: flex; justify-content: space-between; gap: 8px; }
 .modal-actions .danger { background: var(--danger); }
 .modal-actions .secondary { 
@@ -454,6 +494,9 @@ body {
 .edit-bug-modal { width: 550px; }
 .edit-comment-modal { width: 500px; }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #2a3363; position: sticky; top: 0; background: var(--panel); z-index: 10; }
+.modal-title { display: flex; align-items: center; gap: 10px; }
+.modal-title h3 { margin: 0; }
+.modal-logo svg { display: block; }
 .modal-body { padding: 16px; display: grid; gap: 20px; }
 .close-modal { background: transparent; color: var(--muted); border: 1px solid #36407a; border-radius: 6px; padding: 4px 8px; cursor: pointer; }
 
@@ -542,12 +585,18 @@ body {
     background: var(--panel-2);
     color: var(--muted);
     border: 1px solid #2a3363;
-    padding: 10px 20px;
+    padding: 10px 18px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
 }
+
+.tab-btn .tab-icon { display: inline-flex; }
+.tab-btn .tab-icon svg { display: block; width: 22px; height: 22px; }
 
 .tab-btn.active {
     background: var(--accent);
@@ -1229,6 +1278,9 @@ body {
     margin-bottom: 16px;
     animation: bounce 0.6s ease-in-out;
 }
+/* Suporte para imagem como ícone de sucesso */
+.success-icon img { width: 64px; height: 64px; display: block; margin: 0 auto; }
+.success-icon .success-fallback { font-size: 64px; display: block; text-align: center; }
 
 @keyframes bounce {
     0%, 20%, 50%, 80%, 100% {

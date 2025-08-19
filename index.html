@@ -57,7 +57,20 @@
                 <div class="kanban-dropzone" data-status="Backlog">
                     <div class="welcome-card">
                         <div class="welcome-header">
-                            <div class="welcome-icon">🚀</div>
+                            <div class="welcome-icon">
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Círculo de fundo -->
+                                    <circle cx="16" cy="16" r="15" fill="#87CEEB" stroke="#5F9EA0" stroke-width="1"/>
+                                    
+                                    <!-- Estrela/Shuriken principal -->
+                                    <path d="M16 4 L20 12 L28 16 L20 20 L16 28 L12 20 L4 16 L12 12 Z" fill="#696969"/>
+                                    <path d="M16 6 L18.5 12 L24 16 L18.5 20 L16 26 L13.5 20 L8 16 L13.5 12 Z" fill="#808080"/>
+                                    <path d="M16 8 L17 12 L20 16 L17 20 L16 24 L15 20 L12 16 L15 12 Z" fill="#A9A9A9"/>
+                                    
+                                    <!-- Sombra -->
+                                    <ellipse cx="20" cy="22" rx="8" ry="3" fill="#4682B4" opacity="0.6"/>
+                                </svg>
+                            </div>
                             <h3>Bem-vindo ao Jiraiya!</h3>
                         </div>
                         <div class="welcome-tips">
@@ -160,8 +173,31 @@
                 <!-- Abas de Documentação e Bugs -->
                 <div class="modal-tabs">
                     <div class="tab-buttons">
-                        <button class="tab-btn active" data-tab="documentation">📋 Documentação</button>
-                        <button class="tab-btn" data-tab="bugs">🐛 Bugs</button>
+                        <button class="tab-btn active" data-tab="documentation">
+                            <span class="tab-icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="10" y="8" width="32" height="42" rx="4" fill="#ffffff" stroke="#1e2a3b" stroke-width="4"/>
+                                    <circle cx="44" cy="46" r="14" fill="#ff0d6a" stroke="#1e2a3b" stroke-width="4"/>
+                                    <path d="M38 46h12" stroke="#ffe400" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M44 40v12" stroke="#ffe400" stroke-width="4" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                            Documentação
+                        </button>
+                        <button class="tab-btn" data-tab="bugs">
+                            <span class="tab-icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="18" y="14" width="28" height="36" rx="14" fill="#f56b81" stroke="#3a4150" stroke-width="4"/>
+                                    <circle cx="32" cy="32" r="8" fill="#3a4150"/>
+                                    <circle cx="24" cy="44" r="6" fill="#3a4150"/>
+                                    <circle cx="40" cy="44" r="6" fill="#3a4150"/>
+                                    <path d="M12 28h12M40 28h12" stroke="#3a4150" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M24 8l8 8 8-8" stroke="#3a4150" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M12 52l12-8M52 52l-12-8" stroke="#3a4150" stroke-width="4" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                            Bugs
+                        </button>
                     </div>
                     
                     <!-- Aba de Documentação -->
@@ -431,7 +467,7 @@
             </div>
             <div class="modal-body">
                 <div class="evidence-success-section">
-                    <div class="success-icon">🎉</div>
+                    <div class="success-icon"><img id="evidenceSuccessIcon" alt="Ícone de confirmação" /><span class="success-fallback" aria-hidden="true">🎉</span></div>
                     <h4>Evidências adicionadas com sucesso!</h4>
                     <p class="success-message">As evidências foram anexadas ao bug "<span id="successBugTitle" class="bug-title"></span>".</p>
                     <div class="evidence-summary">
@@ -460,7 +496,18 @@
     <div id="welcomeIntroModal" class="modal" aria-hidden="true">
         <div class="modal-content intro-modal">
             <div class="modal-header">
-                <h3>🚀 Bem-vindo ao Jiraiya</h3>
+                <div class="modal-title">
+                    <span class="modal-logo">
+                        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="16" r="15" fill="#87CEEB" stroke="#5F9EA0" stroke-width="1"/>
+                            <path d="M16 4 L20 12 L28 16 L20 20 L16 28 L12 20 L4 16 L12 12 Z" fill="#696969"/>
+                            <path d="M16 6 L18.5 12 L24 16 L18.5 20 L16 26 L13.5 20 L8 16 L13.5 12 Z" fill="#808080"/>
+                            <path d="M16 8 L17 12 L20 16 L17 20 L16 24 L15 20 L12 16 L15 12 Z" fill="#A9A9A9"/>
+                            <ellipse cx="20" cy="22" rx="8" ry="3" fill="#4682B4" opacity="0.6"/>
+                        </svg>
+                    </span>
+                    <h3>Bem-vindo ao Jiraiya</h3>
+                </div>
                 <button class="close-modal" id="closeWelcomeIntroModal" aria-label="Fechar">✕</button>
             </div>
             <div class="modal-body">
