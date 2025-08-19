@@ -100,8 +100,67 @@ const nextId = () => state.seq++;
 const formatTaskKey = (n) => `JRY-${String(n).padStart(4, '0')}`;
 const nextTaskKey = () => formatTaskKey(state.taskSeq++);
 
+// Persistência em Local Storage
+const STORAGE_KEY = 'JIRAIYA_APP_STATE';
+
+function saveState() {
+    try {
+        const payload = {
+            tasks: state.tasks,
+            testCases: state.testCases,
+            bugs: state.bugs,
+            sprintEnd: state.sprintEnd ? state.sprintEnd.toISOString() : null,
+            seq: state.seq,
+            taskSeq: state.taskSeq,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch (_) {}
+}
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== 'object') return;
+        state.tasks = Array.isArray(data.tasks) ? data.tasks : [];
+        // Migração de status antigo
+        state.tasks.forEach(t => { if (t.status === 'Pendente de Aprovação') t.status = 'Fixing'; });
+        state.testCases = Array.isArray(data.testCases) ? data.testCases : [];
+        state.bugs = Array.isArray(data.bugs) ? data.bugs : [];
+        state.sprintEnd = data.sprintEnd ? new Date(data.sprintEnd) : null;
+        state.seq = Number.isFinite(data.seq) ? data.seq : inferNextSeq();
+        state.taskSeq = Number.isFinite(data.taskSeq) ? data.taskSeq : inferNextTaskSeq();
+    } catch (_) {}
+}
+
+function inferNextSeq() {
+    let maxId = 0;
+    [...state.tasks, ...state.testCases, ...state.bugs].forEach(x => { if (x && typeof x.id === 'number') maxId = Math.max(maxId, x.id); });
+    state.bugs.forEach(b => (b.evidence || []).forEach(ev => { if (ev && typeof ev.id === 'number') maxId = Math.max(maxId, ev.id); }));
+    return maxId + 1;
+}
+
+function inferNextTaskSeq() {
+    const extract = (k) => {
+        const m = /JRY-(\d+)/.exec(k || '');
+        return m ? parseInt(m[1], 10) : 0;
+    };
+    let maxNum = 0;
+    state.tasks.forEach(t => { maxNum = Math.max(maxNum, extract(t.taskKey)); });
+    return maxNum + 1;
+}
+
+function formatDateInput(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
+    loadState();
     bindTabs();
     bindSprintControls();
     bindNewTaskForm();
@@ -145,10 +204,14 @@ function bindSprintControls() {
         const d = new Date(dateInput.value);
         if (Number.isNaN(d.getTime())) return;
         state.sprintEnd = d;
+        saveState();
         updateCountdown(countdown);
     });
     setInterval(() => updateCountdown(countdown), 60 * 1000);
     updateCountdown(countdown);
+    if (state.sprintEnd) {
+        dateInput.value = formatDateInput(state.sprintEnd);
+    }
 }
 
 function updateCountdown(node) {
@@ -171,6 +234,7 @@ function bindNewTaskForm() {
         const taskKey = nextTaskKey();
         state.tasks.push({ id: nextId(), taskKey, title, description, priority, status: 'Backlog', type: 'Feature', comments: [] });
         form.reset();
+        saveState();
         renderKanban();
         updateMetrics();
     });
@@ -399,6 +463,7 @@ function bindKanbanDropzones() {
                 }
             }
             task.status = targetStatus;
+            saveState();
             renderKanban();
             updateMetrics();
         });
@@ -448,6 +513,7 @@ function bindModal() {
         const id = Number(byId('editCardId').value);
         const idx = state.tasks.findIndex(t => t.id === id);
         if (idx >= 0) state.tasks.splice(idx, 1);
+        saveState();
         closeCardModal();
         renderKanban();
         updateMetrics();
@@ -470,6 +536,7 @@ function bindModal() {
         t.priority = byId('editCardPriority').value;
         t.status = targetStatus;
         t.type = byId('editCardType').value;
+        saveState();
         renderKanban();
         updateMetrics();
         closeCardModal();
@@ -486,6 +553,7 @@ function bindModal() {
         t.comments.push({ text, files });
         byId('commentText').value = '';
         filesInput.value = '';
+        saveState();
         renderComments(t);
     });
 }
@@ -609,7 +677,7 @@ function renderComments(task) {
         del.textContent = 'Excluir';
         del.addEventListener('click', () => {
             const i = task.comments.indexOf(c);
-            if (i >= 0) { task.comments.splice(i, 1); renderComments(task); }
+            if (i >= 0) { task.comments.splice(i, 1); saveState(); renderComments(task); }
         });
         
         actions.appendChild(edit);
@@ -631,6 +699,7 @@ function bindTestCaseForm() {
         const testCase = { id: nextId(), description, executed: false, taskId: currentTaskId };
         state.testCases.push(testCase);
         tcForm.reset();
+        saveState();
         renderTestCasesList();
         updateMetrics();
     });
@@ -658,6 +727,7 @@ function renderTestCasesList() {
         toggle.textContent = tc.executed ? 'Desmarcar' : 'Executado';
         toggle.addEventListener('click', () => { 
             tc.executed = !tc.executed; 
+            saveState();
             renderTestCasesList(); 
             updateMetrics(); 
         });
@@ -671,6 +741,7 @@ function renderTestCasesList() {
         del.addEventListener('click', () => { 
             const i = state.testCases.findIndex(x => x.id === tc.id); 
             if (i >= 0) state.testCases.splice(i, 1); 
+            saveState();
             renderTestCasesList(); 
             updateMetrics(); 
         });
@@ -705,6 +776,7 @@ function bindBugForm() {
         const currentTaskId = Number(byId('editCardId').value);
         state.bugs.push({ id: nextId(), title, description, priority, status, taskId: currentTaskId, evidence: [] });
         form.reset();
+        saveState();
         renderBugsList();
         updateMetrics();
     });
@@ -742,6 +814,7 @@ function renderBugsList() {
         del.addEventListener('click', () => { 
             const i = state.bugs.findIndex(x => x.id === b.id); 
             if (i>=0) state.bugs.splice(i,1); 
+            saveState();
             renderBugsList(); 
             updateMetrics(); 
         });
@@ -925,6 +998,7 @@ function handleEditTestCaseSubmit(e) {
     if (!newDescription) return;
     
     editingTestCase.description = newDescription;
+    saveState();
     closeEditTestCaseModal();
     renderTestCasesList();
     updateMetrics();
@@ -941,6 +1015,7 @@ function handleEditBugSubmit(e) {
     editingBug.description = byId('editBugDescription').value.trim();
     editingBug.priority = byId('editBugPriority').value;
     editingBug.status = byId('editBugStatus').value;
+    saveState();
     
     closeEditBugModal();
     renderBugsList();
@@ -969,6 +1044,7 @@ function handleEditCommentSubmit(e) {
     if (!newText) return;
     
     editingComment.text = newText;
+    saveState();
     closeEditCommentModal();
     
     // Re-renderizar comentários da tarefa atual
@@ -1057,6 +1133,7 @@ function handleEvidenceSubmit(e) {
     };
     
     bug.evidence.push(evidence);
+    saveState();
     
     closeEvidenceModal();
     renderBugsList();
