@@ -32,6 +32,8 @@ body {
     position: sticky;
     top: 0;
     z-index: 10;
+    backdrop-filter: saturate(120%) blur(6px);
+    -webkit-backdrop-filter: saturate(120%) blur(6px);
 }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand .logo { 
@@ -189,7 +191,8 @@ body {
     color: var(--accent-2);
 }
 
-.card { background: var(--panel-2); border: 1px solid #2d3766; border-radius: 10px; padding: 10px; cursor: grab; box-shadow: var(--shadow); }
+.card { background: var(--panel-2); border: 1px solid #2d3766; border-radius: 10px; padding: 10px; cursor: grab; box-shadow: var(--shadow); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,.45); border-color: #39447a; }
 .card:active { cursor: grabbing; }
 
 /* Estilos para Tags de Tarefas */
@@ -550,11 +553,13 @@ body {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(108,140,255,.25) inset;
 }
 
 .tab-btn:hover:not(.active) {
     background: var(--accent-1);
-    color: var(--bg);
+    color: var(--text);
+    transform: translateY(-1px);
 }
 
 .tab-content {
@@ -1319,6 +1324,8 @@ body {
     bottom: 0;
     width: 100%;
     z-index: 10;
+    backdrop-filter: saturate(120%) blur(6px);
+    -webkit-backdrop-filter: saturate(120%) blur(6px);
 }
 
 .footer-content { display: none; }
