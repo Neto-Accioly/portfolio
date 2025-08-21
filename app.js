@@ -1208,15 +1208,20 @@ function updateMetrics() {
     const testsTotal = state.testCases.length;
     const testsExecuted = state.testCases.filter(tc => tc.executed).length;
     const pct = testsTotal ? (testsExecuted / testsTotal) * 100 : 0;
-    byId('metricTests').textContent = fmtPct(pct);
+    // Atualiza apenas se os elementos existirem no DOM
+    const setTextContentIfExists = (elementId, text) => {
+        const el = byId(elementId);
+        if (el) el.textContent = text;
+    };
+    setTextContentIfExists('metricTests', fmtPct(pct));
 
     const bugsOpen = state.bugs.filter(b => b.status !== 'Closed').length;
     const bugsClosed = state.bugs.filter(b => b.status === 'Closed').length;
-    byId('metricBugs').textContent = `${bugsOpen} / ${bugsClosed}`;
+    setTextContentIfExists('metricBugs', `${bugsOpen} / ${bugsClosed}`);
 
     const tasksDone = state.tasks.filter(t => t.status === 'Pronto').length;
     const tasksTotal = state.tasks.length;
-    byId('metricTasks').textContent = `${tasksDone} / ${tasksTotal}`;
+    setTextContentIfExists('metricTasks', `${tasksDone} / ${tasksTotal}`);
     
     // Estatísticas do card de boas-vindas removidas
 }
