@@ -44,11 +44,7 @@ describe('CT01 - Criar Tarefa no Kanban do Jiraiya', () => {
       });
     cy.get('#taskPriority').select('Alta').should('have.value', 'Alta');
 
-    // Passo 4: Selecionar "Tipo"
-    // Observação: o formulário de criação não possui o campo "Tipo"; a seleção é feita no modal de edição.
-    // Portanto, validamos e selecionamos o tipo após criar a tarefa.
-
-    // Passo 5: Clicar em "Adicionar ao Backlog"
+    // Passo 4: Clicar em "Adicionar ao Backlog"
     cy.get('#newTaskForm').within(() => {
       cy.contains('button', 'Adicionar ao Backlog').click();
     });
