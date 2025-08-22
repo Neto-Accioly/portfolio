@@ -1,4 +1,4 @@
-# Baseado no meu conhecimento atual venho desenvolvendo e evoluindo o projeto conforme evoluo nos estudos.
+# Baseado no meu conhecimento atual venho desenvolvendo e evoluindo o projeto conforme avanço nos estudos.
 
 # ✬ Projeto Jiraiya – Laboratório de Qualidade de Software (QA)
 
