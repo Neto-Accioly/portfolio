@@ -31,22 +31,23 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 ## ✔️ Checkpoint do Laboratório
 
 ### 🔹 O que já fiz até agora
-- Estruturei o **projeto base** com suporte a Kanban, documentação de casos de teste e reporte de defeitos.  
-- Criei a **documentação completa** do ciclo de QA na Wiki do GitHub.  
+- Estruturei o **projeto base** com suporte a Kanban, criação de tarefas com descrição, prioridade e tipo da tarefa(Feature, Bug ou Melhoria), documentação de casos de teste, controle de bugs, possibilidade de anexar evidências, contador regressivo do prazo final da sprint ágil e dashboard com métricas de acompanhamento da sprint.  
+- Criei a **documentação completa** do ciclo de QA e armazenei na Wiki do GitHub.  
 - Comecei a automação de testes end-to-end com [Cypress](https://www.cypress.io/). ---> [🎬Vídeo da execução do primeiro teste automatizado E2E.](https://jam.dev/c/29ab5f22-d5d7-4bd9-8d4d-df01b1733f4b) 
 - Realizei testes de **responsividade** com [Responsive Viewer](https://chrome.google.com/webstore/detail/responsive-viewer/inmopeiepgfljkpkidclfgbgbmfcennb). ---> [🎬Exemplo em vídeo utilizando meu teste de responsividade.](https://jam.dev/c/79753bdc-4935-4ad4-933b-23eb31c072aa) 
 - Avaliei **acessibilidade** com [Axe Accessibility](https://www.deque.com/axe/). ---> [🎬Exemplo em vídeo utilizando meu teste de Acessibilidade.](https://jam.dev/c/eb1e707a-2f07-4980-b5f3-a9f55c179e4e)
-- Realizei testes de **performance** com [Lighthouse](https://developer.chrome.com/docs/lighthouse/). ---> [🎬Exemplo em vídeo utilizando meu teste de Performance.](https://jam.dev/c/9650b583-cca8-4a60-8895-9d12cb6cd00b)
-- Gravei **evidências de testes** utilizando [Jam](https://jam.dev/).  
-- Relatórios HTML no Cypress com [Mochawesome](https://www.npmjs.com/package/mochawesome) ---> [🎬Exemplo em vídeo utilizando meu teste automatizado.](https://jam.dev/c/978336e9-0a94-4cd1-aa97-f1ca1e512a40)  
+- Realizei testes de **performance** com [Lighthouse](https://developer.chrome.com/docs/lighthouse/). ---> [🎬Exemplo em vídeo utilizando meu teste de Performance.](https://jam.dev/c/9650b583-cca8-4a60-8895-9d12cb6cd00b)  
+- Implementei relatórios dos testes Cypress em HTML com [Mochawesome](https://www.npmjs.com/package/mochawesome). ---> [🎬Exemplo em vídeo utilizando meu teste automatizado.](https://jam.dev/c/978336e9-0a94-4cd1-aa97-f1ca1e512a40)
+- Gravei todas as **evidências de testes** utilizando [Jam](https://jam.dev/).  
 
 ### 🔹 O que vem pela frente
 - **Explorar ao máximo** o front-end do Jiraiya para aumentar a cobertura de testes automatizados.  
-- Criar uma **API do zero** com auxílio de **IA generativa**.  
-- Utilizar a heurística **[VADER](https://github.com/cjhutto/vaderSentiment)** para validar comportamentos.  
+- Criar uma **API do zero**.
+- Documentar todo.
+- Utilizar a heurística **[VADER](https://github.com/cjhutto/vaderSentiment)** para validar comportamentos da API Rest.  
 - Automatizar testes de API com [Mocha](https://mochajs.org/), [Chai](https://www.chaijs.com/) e [Supertest](https://www.npmjs.com/package/supertest).  
-- Gerar relatórios HTML com [Mochawesome](https://www.npmjs.com/package/mochawesome).  
-- Realizar **testes de performance** com [k6](https://k6.io/).  
+- Gerar relatórios dos testes na API Rest em HTML com [Mochawesome](https://www.npmjs.com/package/mochawesome).  
+- Realizar **testes de performance** na API Rest com [k6](https://k6.io/).  
 
 ---
 
