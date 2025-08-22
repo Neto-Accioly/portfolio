@@ -28,7 +28,7 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 
 ---
 
-## ✅ Checkpoint do Laboratório
+## ✔️ Checkpoint do Laboratório
 
 ### 🔹 O que já fiz até agora
 - Estruturei o **projeto base** com suporte a Kanban, documentação de casos de teste e reporte de defeitos.  
@@ -49,9 +49,26 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 
 ---
 
-## 🗂 Estrutura de Pastas
+## 🗄️ Estrutura de Pastas
 
-### Estrutura Atual (fase de aprendizado)
+### 📁 Estrutura Atual (fase de aprendizado)
+```bash
+portfolio/
+├── cypress/ # Testes automatizados com Cypress
+│ ├── e2e/ # Casos de teste automatizados
+│ ├── fixtures/ # Massa de dados para testes
+│ ├── support/ # Configurações e comandos customizados
+├── .gitignore 
+├── app.js
+├── cypress.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── README.md
+└── style.css
+```
+
+### 📁 Estrutura como vai ficar a estrutura atual corrigida (Em breve)
 ```bash
 portfolio/
 ├── cypress/ # Testes automatizados com Cypress
@@ -65,7 +82,7 @@ portfolio/
 ```
 
 
-### Estrutura Futura (mais profissional e escalável)
+### 🗂️ Estrutura Futura quando incluir API (mais profissional e escalável)
 ```bash
 portfolio/
 ├── tests/ # Pasta dedicada para todos os testes
@@ -86,7 +103,7 @@ portfolio/
 
 ---
 
-## 🚀 Como rodar o projeto
+## ⚙️ Como rodar o projeto
 
 ### 1. Clone o repositório
 ```bash
