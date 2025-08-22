@@ -119,20 +119,47 @@ portfolio/
 ### 🗂️ Estrutura Futura quando incluir API (mais profissional e escalável)
 ```bash
 portfolio/
-├── tests/              # Pasta dedicada para todos os testes
-│ ├── e2e/              # Testes end-to-end
-│ ├── api/              # Testes de API (Mocha, Chai, Supertest)
-│ ├── performance/      # Testes de performance (k6)
-│ ├── accessibility/    # Scripts de acessibilidade
-├── reports/            # Relatórios automatizados (Mochawesome, evidências)
-├── docs/               # Documentação e wiki local
-├── src/                # Código da aplicação
-│ ├── api/              # Serviços de backend
-│ ├── ui/               # Componentes de interface
-│ ├── utils/            # Utilitários e helpers
-├── config/             # Configurações de testes e ambientes
-├── package.json
-└── README.md
+├── src/                          # Código-fonte da aplicação (frontend)
+│   ├── assets/                   # Imagens, ícones, fontes...
+│   ├── css/                      # Arquivos de estilo
+│   │   └── style.css
+│   ├── js/                       # Scripts de frontend
+│   │   └── app.js
+│   └── index.html                # Página principal
+│
+├── api/                          # Código da API (backend)
+│   ├── controllers/              # Lógica das rotas
+│   ├── models/                   # Modelos de dados (caso use DB)
+│   ├── routes/                   # Definição das rotas
+│   ├── services/                 # Regras de negócio
+│   ├── tests/                    # Testes unitários/integrados da API
+│   ├── app.js                    # Ponto de entrada da API (Express, Fastify, etc.)
+│   └── package.json              # Dependências da API (pode ser separado ou integrado ao principal)
+│
+├── cypress/                      # Testes automatizados de frontend
+│   ├── e2e/                      # Casos de teste automatizados (specs)
+│   ├── fixtures/                 # Massa de dados simulada
+│   └── support/                  # Configurações globais e comandos customizados
+│
+├── k6/                           # Testes de performance
+│   ├── load-test.js              # Teste de carga
+│   ├── stress-test.js            # Teste de estresse
+│   └── smoke-test.js             # Teste rápido de saúde
+│
+├── tests/                        # Testes manuais/documentação de QA
+│   └── test-cases.md             # Casos de teste escritos
+│
+├── docs/                         # Documentação do projeto
+│   ├── arquitetura.md            # Estrutura e decisões técnicas
+│   ├── api-docs.md               # Documentação da API (endpoints)
+│   └── qa-strategy.md            # Estratégia de testes (QA + performance)
+│
+├── .gitignore                    # Ignora node_modules, relatórios, cache etc.
+├── cypress.config.js             # Configuração do Cypress
+├── package-lock.json
+├── package.json                  # Dependências do projeto (monorepo ou integrado)
+├── README.md                     # Documentação inicial
+
 ```
 
 ---
