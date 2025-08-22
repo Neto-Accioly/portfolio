@@ -54,30 +54,46 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 ### 📁 Estrutura Atual (fase de aprendizado)
 ```bash
 portfolio/
-├── cypress/ # Testes automatizados com Cypress
-│ ├── e2e/ # Casos de teste automatizados
-│ ├── fixtures/ # Massa de dados para testes
-│ ├── support/ # Configurações e comandos customizados
-├── .gitignore 
-├── app.js
-├── cypress.config.js
-├── index.html
-├── package-lock.json
-├── package.json
-├── README.md
-└── style.css
+├── cypress/                     # Pasta raiz dos testes automatizados com Cypress
+│   ├── e2e/                     # Casos de teste automatizados (specs)
+│   │   └── exemplo.cy.js        # Cada arquivo aqui representa um conjunto de testes
+│   ├── fixtures/                # Massa de dados para testes
+│   │   └── example.json         # Arquivos JSON com dados mockados para simular entradas
+│   ├── support/                 # Configurações e comandos customizados
+│   │   ├── commands.js          # Definições de comandos personalizados do Cypress
+│   │   └── e2e.js               # Configurações globais que rodam antes dos testes
+│
+├── .gitignore                   # Arquivo que define o que o Git deve ignorar (node_modules, relatórios, etc.)
+│
+├── app.js                       # Arquivo principal em JavaScript da aplicação (lógica do front-end)
+│
+├── cypress.config.js            # Arquivo de configuração do Cypress (timeout, diretórios, baseUrl, reporter, etc.)
+│
+├── index.html                   # Página principal da aplicação (estrutura base em HTML)
+│
+├── package-lock.json            # Arquivo que trava as versões exatas das dependências instaladas (gerado automaticamente)
+│
+├── package.json                  # Arquivo de configuração do projeto Node.js:
+│                                 # - lista scripts (start, test, etc.)
+│                                 # - dependências e devDependencies
+│                                 # - informações do projeto
+│
+├── README.md                     # Documentação inicial do projeto (o que é, como rodar, instruções)
+│
+└── style.css                     # Arquivo de estilos da aplicação (responsável pela parte visual)
+
 ```
 
 ### 📁 Estrutura como vai ficar a estrutura atual corrigida (Em breve)
 ```bash
 portfolio/
-├── cypress/ # Testes automatizados com Cypress
-│ ├── e2e/ # Casos de teste automatizados
-│ ├── fixtures/ # Massa de dados para testes
-│ ├── support/ # Configurações e comandos customizados
-├── docs/ # Evidências, relatórios e anotações
-├── src/ # Código da aplicação (front-end)
-├── package.json
+├── cypress/           # Testes automatizados com Cypress
+│ ├── e2e/             # Casos de teste automatizados
+│ ├── fixtures/        # Massa de dados para testes
+│ ├── support/         # Configurações e comandos customizados
+├── docs/              # Evidências, relatórios e anotações
+├── src/               # Código da aplicação (front-end)
+├── package.json       # Arquivo de configuração do projeto Node.js:
 └── README.md
 ```
 
@@ -85,18 +101,18 @@ portfolio/
 ### 🗂️ Estrutura Futura quando incluir API (mais profissional e escalável)
 ```bash
 portfolio/
-├── tests/ # Pasta dedicada para todos os testes
-│ ├── e2e/ # Testes end-to-end
-│ ├── api/ # Testes de API (Mocha, Chai, Supertest)
-│ ├── performance/ # Testes de performance (k6)
-│ ├── accessibility/ # Scripts de acessibilidade
-├── reports/ # Relatórios automatizados (Mochawesome, evidências)
-├── docs/ # Documentação e wiki local
-├── src/ # Código da aplicação
-│ ├── api/ # Serviços de backend
-│ ├── ui/ # Componentes de interface
-│ ├── utils/ # Utilitários e helpers
-├── config/ # Configurações de testes e ambientes
+├── tests/              # Pasta dedicada para todos os testes
+│ ├── e2e/              # Testes end-to-end
+│ ├── api/              # Testes de API (Mocha, Chai, Supertest)
+│ ├── performance/      # Testes de performance (k6)
+│ ├── accessibility/    # Scripts de acessibilidade
+├── reports/            # Relatórios automatizados (Mochawesome, evidências)
+├── docs/               # Documentação e wiki local
+├── src/                # Código da aplicação
+│ ├── api/              # Serviços de backend
+│ ├── ui/               # Componentes de interface
+│ ├── utils/            # Utilitários e helpers
+├── config/             # Configurações de testes e ambientes
 ├── package.json
 └── README.md
 ```
