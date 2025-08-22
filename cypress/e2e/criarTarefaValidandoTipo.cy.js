@@ -2,6 +2,7 @@
 // Rastreabilidade: REQ-002 — Kanban com Drag & Drop e WIP | Prioridade: Alta
 
 describe('CT01 - Criar Tarefa no Kanban do Jiraiya', () => {
+  //Arrange
   const baseUrl = 'http://localhost:3000/';
 
   beforeEach(() => {

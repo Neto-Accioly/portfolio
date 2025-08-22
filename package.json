@@ -4,7 +4,9 @@
   "main": "app.js",
   "scripts": {
     "start": "http-server -p 3000 -a localhost",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cypress run",
+    "cy:open": "cypress open",
+    "cy:headed": "cypress run --headed"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,7 @@
   "homepage": "https://github.com/Neto-Accioly/portfolio#readme",
   "description": "",
   "devDependencies": {
-    "cypress": "^15.0.0"
+    "cypress": "^15.0.0",
+    "cypress-mochawesome-reporter": "^4.0.2"
   }
 }
