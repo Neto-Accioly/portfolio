@@ -1,12 +1,12 @@
-# Baseado no meu conhecimento atual venho desenvolvendo e evoluindo o projeto conforme avanço nos estudos.
+### 🧪 Este é o MVP do meu Portfolio, baseado no meu conhecimento atual, irei continuar desenvolvendo e evoluindo o projeto conforme avanço nos estudos.
 
 # ✬ Projeto Jiraiya – Laboratório de Qualidade de Software (QA)
 
-Jiraiya é uma **plataforma web para gestão de projetos**, focada em **Kanban, documentação de casos de teste, controle de bugs, evidências e métricas de acompanhamento**.  
+Jiraiya é uma **plataforma web para gestão de projetos**, inspirada no Jira, focada em **Kanban, criação de tarefas com descrição, prioridade e tipo da tarefa(Feature, Bug ou Melhoria), documentação de casos de teste, controle de bugs, possibilidade de anexar evidências, contador regressivo do prazo final da sprint ágil e dashboard com métricas de acompanhamento da sprint**.  
 O sistema é moderno, responsivo e pensado para **equipes ágeis**.
 
 Este projeto nasceu como parte do meu **portfólio de Qualidade de Software (QA)**, fruto da minha jornada de aprendizado na [Mentoria M2.0 do Júlio de Lima](https://juliodelima.com.br/).  
-Mesmo não sendo desenvolvedor, decidi criar do zero uma aplicação completa, contando com o apoio de **IA generativa** para transformar ideias em código.  
+Esse desafio consistiu em criar os requisitos e gerar do zero uma aplicação Web ou API Rest, apartir disso construir todo o planejamento para testar o software criado, executar os testes, reportar os defeitos(bugs) e automatizar os testes necessários.   
 
 O **Jiraiya é mais do que uma aplicação**: ele é meu **laboratório de testes, documentação e automação**, onde aplico na prática tudo que venho aprendendo sobre qualidade de software.
 
@@ -21,7 +21,7 @@ Toda a documentação do Jiraiya está organizada na [Wiki do repositório](http
 - [🧠 Heurísticas Utilizadas](https://github.com/Neto-Accioly/portfolio/wiki/Heur%C3%ADsticas-Utilizadas)  
 - [🗂 Plano e Estratégia de Testes](https://github.com/Neto-Accioly/portfolio/wiki/Plano-e-Estrat%C3%A9gia-de-Testes-–-Projeto-Jiraiya)  
 - [📝 Relatório de Sessão (Testes Exploratórios)](https://github.com/Neto-Accioly/portfolio/wiki/Relat%C3%B3rio-de-Sess%C3%A3o-(Testes-Explorat%C3%B3rios))  
-- [🐛 Reporte de Defeitos](https://github.com/Neto-Accioly/portfolio/wiki/Reporte-de-defeitos)  
+- [🐞 Reporte de Defeitos](https://github.com/Neto-Accioly/portfolio/wiki/Reporte-de-defeitos)  
 - [🤖 Testes Automatizados](https://github.com/Neto-Accioly/portfolio/wiki/Testes-Automatizados)  
 
 Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos demonstrando na prática.
@@ -52,7 +52,7 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 ## 🗂 Estrutura de Pastas
 
 ### Estrutura Atual (fase de aprendizado)
-
+```bash
 portfolio/
 ├── cypress/ # Testes automatizados com Cypress
 │ ├── e2e/ # Casos de teste automatizados
@@ -62,10 +62,11 @@ portfolio/
 ├── src/ # Código da aplicação (front-end)
 ├── package.json
 └── README.md
+```
 
 
 ### Estrutura Futura (mais profissional e escalável)
-
+```bash
 portfolio/
 ├── tests/ # Pasta dedicada para todos os testes
 │ ├── e2e/ # Testes end-to-end
@@ -81,7 +82,7 @@ portfolio/
 ├── config/ # Configurações de testes e ambientes
 ├── package.json
 └── README.md
-
+```
 
 ---
 
@@ -122,7 +123,7 @@ A ideia é que no futuro este repositório sirva como laboratório aberto de est
 
 - Acompanhar a evolução de um projeto QA do zero até práticas avançadas
 
-Lindemir Accioly Neto
+### Lindemir Accioly Neto
 QA em transição de carreira | Estudante da Mentoria M2.0 do Júlio de Lima
 
 [LinkedIn](https://www.linkedin.com/in/lindemir-accioly-neto-/)
