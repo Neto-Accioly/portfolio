@@ -37,7 +37,7 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 - Realizei testes de **responsividade** com [Responsive Viewer](https://chrome.google.com/webstore/detail/responsive-viewer/inmopeiepgfljkpkidclfgbgbmfcennb).  
 - Avaliei **acessibilidade** com [Axe Accessibility](https://www.deque.com/axe/) e [Lighthouse](https://developer.chrome.com/docs/lighthouse/).  
 - Gravei **evidências de testes** utilizando [Jam](https://jam.dev/).  
-- Relatórios HTML no Cypress com [Mochawesome](https://www.npmjs.com/package/mochawesome) [Exemplo em vídeo do meu teste automatizado](https://jam.dev/c/978336e9-0a94-4cd1-aa97-f1ca1e512a40)  
+- Relatórios HTML no Cypress com [Mochawesome](https://www.npmjs.com/package/mochawesome) ---> [✨Exemplo em vídeo do meu teste automatizado.](https://jam.dev/c/978336e9-0a94-4cd1-aa97-f1ca1e512a40)  
 
 ### 🔹 O que vem pela frente
 - **Explorar ao máximo** o front-end do Jiraiya para aumentar a cobertura de testes automatizados.  
