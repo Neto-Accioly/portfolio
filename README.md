@@ -30,7 +30,7 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 
 ## ✔️ Checkpoint do Laboratório
 
-### 🔹 O que já fiz até agora
+### ✔ O que já fiz até agora
 - Estruturei o **projeto base** com suporte a Kanban, criação de tarefas com descrição, prioridade e tipo da tarefa(Feature, Bug ou Melhoria), documentação de casos de teste, controle de bugs, possibilidade de anexar evidências, contador regressivo do prazo final da sprint ágil e dashboard com métricas de acompanhamento da sprint.  
 - Criei a **documentação completa** do ciclo de QA e armazenei na Wiki do GitHub.  
 - Comecei a automação de testes end-to-end com [Cypress](https://www.cypress.io/). ---> [🎬Vídeo da execução do primeiro teste automatizado E2E.](https://jam.dev/c/29ab5f22-d5d7-4bd9-8d4d-df01b1733f4b) 
@@ -40,7 +40,7 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 - Implementei relatórios dos testes Cypress em HTML com [Mochawesome](https://www.npmjs.com/package/mochawesome). ---> [🎬Exemplo em vídeo utilizando meu teste automatizado.](https://jam.dev/c/978336e9-0a94-4cd1-aa97-f1ca1e512a40)
 - Gravei todas as **evidências de testes** utilizando [Jam](https://jam.dev/).  
 
-### 🔹 O que vem pela frente
+### ⏳ O que vem pela frente
 - **Explorar ao máximo** o front-end do Jiraiya para aumentar a cobertura de testes automatizados.  
 - Criar uma **API do zero**.
 - Documentar todo.
