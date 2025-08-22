@@ -73,14 +73,14 @@ portfolio/
 │
 ├── package-lock.json            # Arquivo que trava as versões exatas das dependências instaladas (gerado automaticamente)
 │
-├── package.json                  # Arquivo de configuração do projeto Node.js:
-│                                 # - lista scripts (start, test, etc.)
-│                                 # - dependências e devDependencies
-│                                 # - informações do projeto
+├── package.json                 # Arquivo de configuração do projeto Node.js:
+│                                # - lista scripts (start, test, etc.)
+│                                # - dependências e devDependencies
+│                                # - informações do projeto
 │
-├── README.md                     # Documentação inicial do projeto (o que é, como rodar, instruções)
+├── README.md                    # Documentação inicial do projeto (o que é, como rodar, instruções)
 │
-└── style.css                     # Arquivo de estilos da aplicação (responsável pela parte visual)
+└── style.css                    # Arquivo de estilos da aplicação (responsável pela parte visual)
 
 ```
 
