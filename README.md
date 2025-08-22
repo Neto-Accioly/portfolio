@@ -33,10 +33,10 @@ Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos
 ### 🔹 O que já fiz até agora
 - Estruturei o **projeto base** com suporte a Kanban, documentação de casos de teste e reporte de defeitos.  
 - Criei a **documentação completa** do ciclo de QA na Wiki do GitHub.  
-- Comecei a automação de testes end-to-end com [Cypress](https://www.cypress.io/). [🎬Vídeo da execução do primeiro teste automatizado E2E.](https://jam.dev/c/29ab5f22-d5d7-4bd9-8d4d-df01b1733f4b) 
-- Realizei testes de **responsividade** com [Responsive Viewer](https://chrome.google.com/webstore/detail/responsive-viewer/inmopeiepgfljkpkidclfgbgbmfcennb). [🎬Exemplo em vídeo utilizando meu teste de responsividade.](https://jam.dev/c/79753bdc-4935-4ad4-933b-23eb31c072aa) 
-- Avaliei **acessibilidade** com [Axe Accessibility](https://www.deque.com/axe/). 
-- Realizei testes de **performance** com [Lighthouse](https://developer.chrome.com/docs/lighthouse/).  
+- Comecei a automação de testes end-to-end com [Cypress](https://www.cypress.io/). ---> [🎬Vídeo da execução do primeiro teste automatizado E2E.](https://jam.dev/c/29ab5f22-d5d7-4bd9-8d4d-df01b1733f4b) 
+- Realizei testes de **responsividade** com [Responsive Viewer](https://chrome.google.com/webstore/detail/responsive-viewer/inmopeiepgfljkpkidclfgbgbmfcennb). ---> [🎬Exemplo em vídeo utilizando meu teste de responsividade.](https://jam.dev/c/79753bdc-4935-4ad4-933b-23eb31c072aa) 
+- Avaliei **acessibilidade** com [Axe Accessibility](https://www.deque.com/axe/). ---> [🎬Exemplo em vídeo utilizando meu teste de Acessibilidade.](https://jam.dev/c/eb1e707a-2f07-4980-b5f3-a9f55c179e4e)
+- Realizei testes de **performance** com [Lighthouse](https://developer.chrome.com/docs/lighthouse/). ---> [🎬Exemplo em vídeo utilizando meu teste de Performance.](https://jam.dev/c/9650b583-cca8-4a60-8895-9d12cb6cd00b)
 - Gravei **evidências de testes** utilizando [Jam](https://jam.dev/).  
 - Relatórios HTML no Cypress com [Mochawesome](https://www.npmjs.com/package/mochawesome) ---> [🎬Exemplo em vídeo utilizando meu teste automatizado.](https://jam.dev/c/978336e9-0a94-4cd1-aa97-f1ca1e512a40)  
 
