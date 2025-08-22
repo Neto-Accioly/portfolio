@@ -86,18 +86,34 @@ portfolio/
 
 ```
 
-### 📁 Estrutura como vai ficar a estrutura atual corrigida (Em breve)
+### 📁 Como vai ficar a estrutura atual corrigida (Em breve)
 ```bash
 portfolio/
-├── cypress/           # Testes automatizados com Cypress
-│ ├── e2e/             # Casos de teste automatizados
-│ ├── fixtures/        # Massa de dados para testes
-│ ├── support/         # Configurações e comandos customizados
-├── docs/              # Evidências, relatórios e anotações
-├── src/               # Código da aplicação (front-end)
-├── package.json       # Arquivo de configuração do projeto Node.js:
-└── README.md
+├── src/                          # Código-fonte da aplicação
+│   ├── assets/                   # Imagens, ícones, fontes...
+│   ├── css/                      # Arquivos de estilo
+│   │   └── style.css
+│   ├── js/                       # Scripts de frontend
+│   │   └── app.js
+│   └── index.html                # Página principal
+│
+├── tests/                        # Testes manuais e documentação de QA
+│   └── test-cases.md             # Casos de teste escritos (além do Cypress)
+│
+├── cypress/                      # Testes automatizados com Cypress
+│   ├── e2e/                      # Casos de teste automatizados (specs)
+│   ├── fixtures/                 # Massa de dados simulada
+│   └── support/                  # Configurações globais e comandos customizados
+│
+├── .gitignore                    # Ignora node_modules, relatórios, cache etc.
+├── cypress.config.js             # Configuração do Cypress
+├── package-lock.json
+├── package.json
+├── README.md                     # Documentação inicial
+└── docs/                         # Documentação adicional do projeto
+    └── arquitetura.md            # Explica estrutura e decisões do projeto
 ```
+
 
 
 ### 🗂️ Estrutura Futura quando incluir API (mais profissional e escalável)
