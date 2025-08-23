@@ -164,6 +164,15 @@ portfolio/
 
 ---
 
+## 🔎 Tecnologias Utilizadas
+
+### Frontend:
+- HTML, CSS e JavaScript puro.
+### Persistência:
+- LocalStorage (Dados mantidos localmente no navegador)
+### Backend
+- Em Breve
+
 ## ⚙️ Como rodar o projeto
 
 ### 1. Clone o repositório
