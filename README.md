@@ -24,7 +24,7 @@ Toda a documentação do Jiraiya está organizada na [Wiki do repositório](http
 - [🐞 Reporte de Defeitos](https://github.com/Neto-Accioly/portfolio/wiki/Reporte-de-defeitos)  
 - [🤖 Testes Automatizados](https://github.com/Neto-Accioly/portfolio/wiki/Testes-Automatizados)  
 
-Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos demonstrando na prática.
+📢Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos demonstrando na prática.
 
 ---
 
