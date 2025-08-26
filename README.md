@@ -16,7 +16,7 @@ O **Jiraiya é mais do que uma aplicação**: ele é meu **laboratório de teste
 
 Toda a documentação do Jiraiya está organizada na [Wiki do repositório](https://github.com/Neto-Accioly/portfolio/wiki):
 
-- [📖 Análise Geral do Projeto](https://github.com/Neto-Accioly/portfolio/wiki/Jiraiya-–-Análise-Geral-do-Projeto)  
+- [📖 Análise Geral do Projeto (Requisitos/Critérios de aceite/Regras de Negócio/User Stories)](https://github.com/Neto-Accioly/portfolio/wiki/Jiraiya-–-Análise-Geral-do-Projeto)  
 - [🧾 Casos de Teste](https://github.com/Neto-Accioly/portfolio/wiki/Casos-de-teste)  
 - [🧠 Heurísticas Utilizadas](https://github.com/Neto-Accioly/portfolio/wiki/Heur%C3%ADsticas-Utilizadas)  
 - [🗂 Plano e Estratégia de Testes](https://github.com/Neto-Accioly/portfolio/wiki/Plano-e-Estrat%C3%A9gia-de-Testes-–-Projeto-Jiraiya)  
