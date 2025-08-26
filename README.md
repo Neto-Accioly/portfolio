@@ -22,7 +22,8 @@ Toda a documentação do Jiraiya está organizada na [Wiki do repositório](http
 - [🗂 Plano e Estratégia de Testes](https://github.com/Neto-Accioly/portfolio/wiki/Plano-e-Estrat%C3%A9gia-de-Testes-–-Projeto-Jiraiya)  
 - [📝 Relatório de Sessão (Testes Exploratórios)](https://github.com/Neto-Accioly/portfolio/wiki/Relat%C3%B3rio-de-Sess%C3%A3o-(Testes-Explorat%C3%B3rios))  
 - [🐞 Reporte de Defeitos](https://github.com/Neto-Accioly/portfolio/wiki/Reporte-de-defeitos)  
-- [🤖 Testes Automatizados](https://github.com/Neto-Accioly/portfolio/wiki/Testes-Automatizados)  
+- [🤖 Testes Automatizados](https://github.com/Neto-Accioly/portfolio/wiki/Testes-Automatizados)
+- [✨ Melhorias](https://github.com/Neto-Accioly/portfolio/wiki/Melhorias)  
 
 📢Obs: Ainda vou incluir muito mais, além das documentações irei gravar vídeos demonstrando na prática.
 
